@@ -1,5 +1,5 @@
 package com.paquete.Bodega.security.filters;
-
+/*
 import com.paquete.Bodega.security.jwt.JwtUtils;
 import com.paquete.Bodega.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
@@ -48,3 +48,4 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+*/

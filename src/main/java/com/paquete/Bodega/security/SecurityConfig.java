@@ -1,5 +1,5 @@
 package com.paquete.Bodega.security;
-
+/*
 import com.paquete.Bodega.security.filters.JwtAuthenticationFilter;
 import com.paquete.Bodega.security.filters.JwtAuthorizationFilter;
 import com.paquete.Bodega.security.jwt.JwtUtils;
@@ -70,4 +70,4 @@ public class SecurityConfig {
                 .and().build();
     }
 
-}
+}*/

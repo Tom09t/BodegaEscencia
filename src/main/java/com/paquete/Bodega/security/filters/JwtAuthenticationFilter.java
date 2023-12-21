@@ -1,7 +1,7 @@
 package com.paquete.Bodega.security.filters;
 
 
-
+/*
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -82,3 +82,5 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         super.successfulAuthentication(request, response, chain, authResult);
     }
 }
+
+ */

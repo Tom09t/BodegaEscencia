@@ -1,5 +1,5 @@
 package com.paquete.Bodega.service;
-
+/*
 import com.paquete.Bodega.models.Usuario;
 import com.paquete.Bodega.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,3 +40,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 authorities);
     }
 }
+*/
