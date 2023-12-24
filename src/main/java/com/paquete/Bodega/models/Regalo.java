@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class Regalo extends BaseEntidad{
 
     @ManyToOne
-    @JoinColumn(name = "producto_id", nullable = false)
+    @JoinColumn(name = "producto_id", nullable = true)
     private Producto producto;
 }

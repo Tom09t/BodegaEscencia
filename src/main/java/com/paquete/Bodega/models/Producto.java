@@ -19,9 +19,10 @@ public class Producto extends BaseEntidad{
     private String nombreProducto;
     private Double precio;
 
-    @ManyToOne
-    @JoinColumn(name = "detalle_venta_id")
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "detalle_venta_id", referencedColumnName = "id", nullable = true)
     private DetalleVenta detalleVenta;
+
 
     @ManyToMany
     @JoinTable(
@@ -36,7 +37,6 @@ public class Producto extends BaseEntidad{
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Regalo> regalos = new ArrayList<>();
-
 
 
 }
