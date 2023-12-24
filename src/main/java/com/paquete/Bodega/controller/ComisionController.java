@@ -1,9 +1,18 @@
 package com.paquete.Bodega.controller;
 
+import com.paquete.Bodega.models.Combo;
+import com.paquete.Bodega.models.Comision;
+import com.paquete.Bodega.services.serviceimpl.ComboServiceImpl;
+import com.paquete.Bodega.services.serviceimpl.ComisionServiceImpl;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/comisiones")
-public class ComisionController {
+public class ComisionController extends BaseControllerImpl<Comision, ComisionServiceImpl>{
+
+
+
 }
