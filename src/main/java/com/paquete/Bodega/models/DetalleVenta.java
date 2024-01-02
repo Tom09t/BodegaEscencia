@@ -22,9 +22,6 @@ public class DetalleVenta extends BaseEntidad{
     @JoinColumn(name = "id_venta")
     private Venta venta;
 
-    @OneToOne
-    @JoinColumn(name = "forma_pago_id")
-    private FormaDePago formaPago;
 
     @OneToMany(mappedBy = "detalleVenta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Producto> productos = new ArrayList<>();
