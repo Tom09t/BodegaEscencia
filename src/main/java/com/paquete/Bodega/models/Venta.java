@@ -19,7 +19,7 @@ public class Venta extends BaseEntidad {
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "formaPago_id", referencedColumnName = "id")
-    @Builder.Default
+
     private FormaDePago formaDePago = new FormaDePago();
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)

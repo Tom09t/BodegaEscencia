@@ -23,8 +23,8 @@ public class DetalleVenta extends BaseEntidad{
     private Venta venta;
 
 
-
-    @OneToMany(mappedBy = "detalleVenta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne
+    @JoinColumn(name = "id_producto")
     private Producto producto;
 
 /*    @OneToMany(mappedBy = "detalleVenta", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -20,7 +20,7 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
     @Autowired
     private VentaServiceImpl  ventaService;
 
-    @PostMapping("/crearVentaConDetalles")
+    @PostMapping("/guardar")
     public ResponseEntity<String> crearVentaConDetalles(@RequestBody List<DetalleVenta> detalles) {
         try {
             Venta venta = ventaService.crearVentaConDetalles(detalles);
