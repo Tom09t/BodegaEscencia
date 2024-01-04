@@ -23,6 +23,10 @@ public class DetalleVenta extends BaseEntidad{
     private Venta venta;
 
 
+
     @OneToMany(mappedBy = "detalleVenta", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Producto> productos = new ArrayList<>();
+    private Producto producto;
+
+/*    @OneToMany(mappedBy = "detalleVenta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Producto> productos = new ArrayList<>();*/
 }

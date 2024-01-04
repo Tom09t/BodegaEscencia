@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-public abstract class BaseControllerImpl <E extends BaseEntidad, S extends BaseServiceImpl<E, Long>> implements BaseController<E, Long> {
+public abstract class BaseControllerImpl <E extends BaseEntidad, S  extends BaseServiceImpl<E, Long>> implements BaseController<E, Long> {
     @Autowired
     protected S servicio;
 
