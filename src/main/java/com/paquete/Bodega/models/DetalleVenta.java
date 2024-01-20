@@ -1,5 +1,7 @@
 package com.paquete.Bodega.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.paquete.Bodega.DTO.ProductoDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,12 +21,16 @@ public class DetalleVenta extends BaseEntidad{
 
     @ManyToOne
     @JoinColumn(name = "id_venta")
+    @JsonIgnore
     private Venta venta;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_producto")
     private Producto producto;
+
+
+
 
 /*    @OneToMany(mappedBy = "detalleVenta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Producto> productos = new ArrayList<>();*/
