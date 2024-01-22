@@ -96,6 +96,11 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
         while (iterator.hasNext()) {
             DetalleVenta detalle = iterator.next();
             if (detalle.getId()==(idDetalle)) {
+                Producto producto = detalle.getProducto();
+
+                if (producto != null) {
+                    producto.setStock(producto.getStock() + detalle.getCantidad());
+                }
                 iterator.remove(); // Eliminar el detalle de la lista
                 detalleVentaRepository.deleteById(idDetalle); // Eliminar el detalle de la base de datos
                 return;

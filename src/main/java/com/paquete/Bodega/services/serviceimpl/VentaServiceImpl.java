@@ -6,6 +6,7 @@ import com.paquete.Bodega.models.DetalleVenta;
 import com.paquete.Bodega.models.Producto;
 import com.paquete.Bodega.models.Venta;
 import com.paquete.Bodega.repository.BaseRepository;
+import com.paquete.Bodega.repository.DetalleVentaRepository;
 import com.paquete.Bodega.repository.ProductoRepository;
 import com.paquete.Bodega.repository.VentaRepository;
 import com.paquete.Bodega.services.service.VentaService;
@@ -32,6 +33,9 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
 
     @Autowired
     private ProductoServiceImpl productoService;
+
+    @Autowired
+    private DetalleVentaRepository detalleVentaRepository;
 
     //Configuraciones necesarias
     public VentaServiceImpl(BaseRepository<Venta, Long> baseRepository, VentaRepository ventaRepository) {
@@ -108,6 +112,32 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
 
        return ventaGuardada;
    }
+
+    public void eliminarVenta(Long idVenta) throws Exception {
+        Venta venta = ventaRepository.findById(idVenta)
+                .orElseThrow(() -> new Exception("Venta no encontrada con ID: " + idVenta));
+
+        List<DetalleVenta> detalles = venta.getDetalles();
+
+        for (DetalleVenta detalle : detalles) {
+            Producto producto = detalle.getProducto();
+
+            // Restar la cantidad del detalle al stock del producto
+            if (producto != null) {
+                producto.setStock(producto.getStock() + detalle.getCantidad());
+                 productoRepository.save(producto);
+            }
+
+            // Eliminar el detalle de la base de datos
+            detalleVentaRepository.deleteById(detalle.getId());
+        }
+
+        // Eliminar la venta de la base de datos
+        ventaRepository.deleteById(idVenta);
+    }
+
+
+
 
 
 
