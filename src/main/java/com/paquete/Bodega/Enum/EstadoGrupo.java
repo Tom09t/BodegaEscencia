@@ -1,6 +1,6 @@
 package com.paquete.Bodega.Enum;
 
-public enum EstadoGrupoNombre {
+public enum EstadoGrupo {
 
     Abierto,
     Cerrado,

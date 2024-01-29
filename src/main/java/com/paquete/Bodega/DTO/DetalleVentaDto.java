@@ -7,5 +7,7 @@ public class DetalleVentaDto {
 
     private Integer cantidad;
     private Double subTotal;
+
     private Long productoId;
+
 }

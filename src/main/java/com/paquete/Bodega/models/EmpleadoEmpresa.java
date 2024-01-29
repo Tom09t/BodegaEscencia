@@ -14,11 +14,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "EmpleadoEmpresa")
 public class EmpleadoEmpresa extends BaseEntidad{
 
-    private int nombreEmpleado;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "comision_id", referencedColumnName = "id")
-    @Builder.Default
-    private Comision comision = new Comision();
+    private String nombreEmpleado;
+    private double comision;
+
 
 }

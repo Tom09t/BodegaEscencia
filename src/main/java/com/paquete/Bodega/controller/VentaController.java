@@ -29,7 +29,7 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/e/{id}")
     public ResponseEntity<String>eliminarVenta(@PathVariable Long idVenta) throws Exception {
 
         ventaService.eliminarVenta(idVenta);

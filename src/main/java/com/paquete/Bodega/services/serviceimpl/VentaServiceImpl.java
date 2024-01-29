@@ -80,6 +80,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
    public Venta crearVentaConDetalles(VentaDto ventaDTO) {
        Venta nuevaVenta = new Venta();
        nuevaVenta.setFechaVenta(ventaDTO.getFechaVenta());
+       nuevaVenta.setFormaPago(ventaDTO.getFormaPago());
 
 
        Venta ventaGuardada = ventaRepository.save(nuevaVenta);
@@ -96,6 +97,8 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
            detalleVenta.setProducto(producto);
            productoService.actualizarStock(detalleDTO.getProductoId(), detalleDTO.getCantidad());
            detalleVenta.setVenta(ventaGuardada);
+
+
 
 
 

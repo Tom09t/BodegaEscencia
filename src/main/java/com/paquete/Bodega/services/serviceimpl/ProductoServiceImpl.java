@@ -35,4 +35,26 @@ public class ProductoServiceImpl extends BaseServiceImpl<Producto,Long> implemen
         producto.setStock(nuevoStock);
         productoRepository.save(producto);
     }
+
+
+    public Producto actualizarProducto(Producto productoActualizado) {
+        // Verificar si el producto existe en la base de datos
+        Producto productoExistente = productoRepository.findById(productoActualizado.getId()).orElse(null);
+
+        if (productoExistente != null) {
+            // Actualizar atributos del producto existente con los nuevos valores
+            productoExistente.setFechaBajaProducto(productoActualizado.getFechaBajaProducto());
+            productoExistente.setNombreProducto(productoActualizado.getNombreProducto());
+            productoExistente.setPrecio(productoActualizado.getPrecio());
+            productoExistente.setStock(productoActualizado.getStock());
+            // SE TIENE Q AGREGAR LOGICA PARA ACTUALIZAR LA LISTA DE COMBO O REGALOS SI HACE FALTA
+
+
+            return productoRepository.save(productoExistente);
+        }
+return null;
+    }
+
+
+
 }

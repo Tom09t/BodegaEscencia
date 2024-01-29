@@ -28,10 +28,6 @@ public class Producto extends BaseEntidad{
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalles = new ArrayList<>();
 
-
-
-
-
     @ManyToMany
     @JoinTable(
             name = "producto_combo",
