@@ -1,5 +1,6 @@
 package com.paquete.Bodega.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,9 +15,15 @@ import lombok.NoArgsConstructor;
 @Table(name = "EmpleadoEmpresa")
 public class EmpleadoEmpresa extends BaseEntidad{
 
-
+    @Column(name = "nombre_empleado", nullable = false)
     private String nombreEmpleado;
     private double comision;
+
+
+    @ManyToOne
+    @JoinColumn(name = "empresa_id")
+    @JsonIgnore
+    private Empresa empresa;
 
 
 }

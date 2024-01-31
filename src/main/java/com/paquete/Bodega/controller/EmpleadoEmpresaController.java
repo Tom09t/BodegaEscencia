@@ -21,7 +21,7 @@ public class EmpleadoEmpresaController extends BaseControllerImpl<EmpleadoEmpres
     @PostMapping("/nuevoEmpleado")
     public ResponseEntity<?> nuevoEmpleado(@RequestParam String nombre, @RequestParam Double comision) {
         try {
-            // Creamos el empleado de la empresa
+
             EmpleadoEmpresa empleadoEmpresa = new EmpleadoEmpresa();
 /*
             // Buscamos que no coincida con ningún empleado de la empresa existente

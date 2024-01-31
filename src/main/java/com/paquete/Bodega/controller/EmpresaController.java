@@ -4,10 +4,14 @@ import com.paquete.Bodega.DTO.NuevaEmpresaDto;
 import com.paquete.Bodega.models.EmpleadoEmpresa;
 import com.paquete.Bodega.models.Empresa;
 import com.paquete.Bodega.repository.EmpleadoEmpresaRepository;
+import com.paquete.Bodega.services.service.EmpresaService;
+import com.paquete.Bodega.services.serviceimpl.EmpleadoEmpresaServiceImpl;
 import com.paquete.Bodega.services.serviceimpl.EmpresaServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,8 +22,61 @@ import java.util.Optional;
 public class EmpresaController extends BaseControllerImpl<Empresa, EmpresaServiceImpl>{
     @Autowired
     EmpleadoEmpresaRepository empleadoEmpresaRepository;
+    @Autowired
+    private EmpresaServiceImpl empresaService;
+
+    @Autowired
+    private EmpleadoEmpresaServiceImpl empleadoEmpresaService;
     @PostMapping("/nuevaEmpresa")
-    public ResponseEntity<?> crearEmpresa(@RequestBody NuevaEmpresaDto nuevaEmpresaDto){
+    public ResponseEntity<Empresa> crearEmpresaConEmpleados(@RequestBody NuevaEmpresaDto nuevaEmpresaDto) {
+        Empresa empresaCreada = empresaService.crearEmpresaConEmpleados(nuevaEmpresaDto);
+        return new ResponseEntity<>(empresaCreada, HttpStatus.CREATED);
+    }
+
+
+    @DeleteMapping("/{empresaId}/empleados/{empleadoId}")
+    public ResponseEntity<String> eliminarEmpleadoEmpresa(
+            @PathVariable Long empresaId,
+            @PathVariable Long empleadoId) {
+
+        try {
+            empleadoEmpresaService.eliminarEmpleadoEmpresa(empleadoId, empresaId);
+            return ResponseEntity.ok("EmpleadoEmpresa eliminado correctamente.");
+        } catch (HttpClientErrorException.NotFound e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró el EmpleadoEmpresa.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocurrió un error al eliminar el EmpleadoEmpresa.");
+        }
+    }
+
+    @PutMapping("/a/{empresaId}")
+    public ResponseEntity<Empresa> actualizarEmpresa(@PathVariable Long empresaId, @RequestBody NuevaEmpresaDto empresaDto) {
+        Empresa empresaActualizadaGuardada = servicio.actualizarEmpresa(empresaId, empresaDto);
+
+        if (empresaActualizadaGuardada != null) {
+            return new ResponseEntity<>(empresaActualizadaGuardada, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    @PutMapping("/agregarE/{empresaId}")
+    public ResponseEntity<EmpleadoEmpresa> agregarEmpleado(
+            @PathVariable Long empresaId,
+            @RequestBody EmpleadoEmpresa empleado) {
+
+        EmpleadoEmpresa nuevoEmpleado = servicio.agregarEmpleado(empresaId, empleado);
+
+        if (nuevoEmpleado != null) {
+            return new ResponseEntity<>(nuevoEmpleado, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    /*public ResponseEntity<?> crearEmpresa(@RequestBody NuevaEmpresaDto nuevaEmpresaDto){
         try {
             //Creamos una nueva empresa
             Empresa empresa = new Empresa();
@@ -51,5 +108,5 @@ public class EmpresaController extends BaseControllerImpl<Empresa, EmpresaServic
         }catch (Exception e){
             return ResponseEntity.status(500).body(e.getMessage());
         }
-    }
+    }*/
 }

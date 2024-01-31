@@ -19,18 +19,17 @@ public class Grupo extends BaseEntidad{
     private int comensales;
     private EstadoGrupo estadoGrupo;
 
-
-  /*  @OneToOne(cascade= CascadeType.ALL, orphanRemoval = true, fetch= FetchType.EAGER)
-    @JoinColumn(name = "mesa_id", referencedColumnName = "id", nullable = true)
-    @Builder.Default
-    private Mesa mesa = new Mesa();*/
-
     private Double montoMesa;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "empresa_id", referencedColumnName = "id")
     @Builder.Default
     private Empresa empresa = new Empresa();
+
+      /*  @OneToOne(cascade= CascadeType.ALL, orphanRemoval = true, fetch= FetchType.EAGER)
+    @JoinColumn(name = "mesa_id", referencedColumnName = "id", nullable = true)
+    @Builder.Default
+    private Mesa mesa = new Mesa();*/
 /*
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "estadoGrupo_id", referencedColumnName = "id")

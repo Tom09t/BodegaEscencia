@@ -20,11 +20,18 @@ public class Empresa extends BaseEntidad{
     private String nombreEmpresa;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "datellePedido_id", referencedColumnName = "id")
-    @Builder.Default
+    @JoinColumn(name = "empresa_id", referencedColumnName = "id")
     private List<EmpleadoEmpresa> empleadoEmpresa = new ArrayList<>();
 
+    /*OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "datellePedido_id", referencedColumnName = "id")
+    private List<EmpleadoEmpresa> empleadoEmpresa = new ArrayList<>();*/
+
+
     public void agregarEmpleadoEmpresa(EmpleadoEmpresa empleadoEmpresa) {
+        if (this.empleadoEmpresa == null) {
+            this.empleadoEmpresa = new ArrayList<>();
+        }
         this.empleadoEmpresa.add(empleadoEmpresa);
     }
 

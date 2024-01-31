@@ -14,6 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 public class NuevaEmpresaDto {
     private String nombreEmpresa;
-    private List<Long> empleadoEmpresa;
+    private List<EmpleadoEmpresa> empleadoEmpresa;
 
 }
