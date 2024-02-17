@@ -18,6 +18,7 @@ public class DetalleVenta extends BaseEntidad{
 
     private Integer cantidad;
     private Double subTotal;
+    private String tipo;
 
     @ManyToOne
     @JoinColumn(name = "id_venta")
@@ -28,6 +29,13 @@ public class DetalleVenta extends BaseEntidad{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_producto")
     private Producto producto;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "combo_id")
+    private Combo combo;
+
+
+
 
 
 

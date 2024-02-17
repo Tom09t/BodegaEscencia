@@ -1,11 +1,15 @@
 package com.paquete.Bodega.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.paquete.Bodega.Enum.EstadoGrupo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -20,11 +24,13 @@ public class Grupo extends BaseEntidad{
     private EstadoGrupo estadoGrupo;
 
     private Double montoMesa;
-
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "empresa_id", referencedColumnName = "id")
-    @Builder.Default
-    private Empresa empresa = new Empresa();
+    private Empresa empresa;
+
+@JsonIgnore
+    @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Venta> ventas = new ArrayList<>();
 
       /*  @OneToOne(cascade= CascadeType.ALL, orphanRemoval = true, fetch= FetchType.EAGER)
     @JoinColumn(name = "mesa_id", referencedColumnName = "id", nullable = true)

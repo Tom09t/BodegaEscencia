@@ -23,6 +23,29 @@ public class ProductoServiceImpl extends BaseServiceImpl<Producto,Long> implemen
         this.productoRepository = productoRepository;
     }
 
+    public Producto guardarProducto(Producto producto) {
+        int stockActual = producto.getStock();
+        int stockRegalo = producto.getStockRegalo();
+
+
+        int stockActualizado = stockActual - stockRegalo;
+
+
+
+        if (stockActualizado < 0) {
+            throw new IllegalStateException("Stock insuficiente");
+        }
+
+        producto.setStock(stockActualizado);
+
+        Producto productoGuardado = productoRepository.save(producto);
+
+
+
+        return productoGuardado;
+    }
+
+
     public void actualizarStock(Long productoId, int cantidad) {
         Producto producto = productoRepository.findById(productoId).orElseThrow(() -> new NoSuchElementException("Producto no encontrado"));
 
@@ -33,6 +56,18 @@ public class ProductoServiceImpl extends BaseServiceImpl<Producto,Long> implemen
         }
 
         producto.setStock(nuevoStock);
+        productoRepository.save(producto);
+    }
+    public void actualizarStockRegalo(Long productoId, int cantidad) {
+        Producto producto = productoRepository.findById(productoId).orElseThrow(() -> new NoSuchElementException("Producto no encontrado"));
+
+        // Actualizar el stock
+        int nuevoStock = producto.getStockRegalo() - cantidad;
+        if (nuevoStock < 0) {
+            throw new IllegalStateException("Stock insuficiente");
+        }
+
+        producto.setStockRegalo(nuevoStock);
         productoRepository.save(producto);
     }
 
@@ -47,6 +82,7 @@ public class ProductoServiceImpl extends BaseServiceImpl<Producto,Long> implemen
             productoExistente.setNombreProducto(productoActualizado.getNombreProducto());
             productoExistente.setPrecio(productoActualizado.getPrecio());
             productoExistente.setStock(productoActualizado.getStock());
+            productoExistente.setStockRegalo(productoActualizado.getStockRegalo());
             // SE TIENE Q AGREGAR LOGICA PARA ACTUALIZAR LA LISTA DE COMBO O REGALOS SI HACE FALTA
 
 

@@ -1,11 +1,15 @@
 package com.paquete.Bodega.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -17,6 +21,16 @@ public class Combo extends BaseEntidad{
 
     private String nombreCombo;
 
-    @ManyToMany(mappedBy = "combos")
-    private Set<Producto> productos = new HashSet<>();
+    private Double precioTotal;
+    @JsonManagedReference
+    @ManyToMany
+    @JoinTable(
+            name = "producto_combo",
+            joinColumns = @JoinColumn(name = "combo_id"),
+            inverseJoinColumns = @JoinColumn(name = "producto_id"))
+    private List<Producto> productos = new ArrayList<>();
+
+
+
+
 }

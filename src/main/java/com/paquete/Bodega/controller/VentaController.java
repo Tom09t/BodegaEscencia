@@ -1,5 +1,6 @@
 package com.paquete.Bodega.controller;
 
+import com.paquete.Bodega.DTO.VentaComboDto;
 import com.paquete.Bodega.DTO.VentaDto;
 import com.paquete.Bodega.models.DetalleVenta;
 import com.paquete.Bodega.models.Venta;
@@ -36,6 +37,16 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
         String mensaje = "venta eliminada con id "+ idVenta;
         return ResponseEntity.ok(mensaje);
 
+    }
+
+    @PostMapping("/ventaCombo")
+    public ResponseEntity<?> crearVentaConCombos(@RequestBody VentaComboDto ventaDTO) {
+        try {
+            Venta ventaGuardada = ventaService.procesarVentaConCombos(ventaDTO);
+            return ResponseEntity.ok(ventaGuardada);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 

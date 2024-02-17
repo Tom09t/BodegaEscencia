@@ -1,6 +1,8 @@
 package com.paquete.Bodega.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +22,8 @@ public class Producto extends BaseEntidad{
     private String nombreProducto;
     private Double precio;
     private int stock;
+    @Column(name = "stock_regalo")
+    private int stockRegalo;
 
    /* @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "detalle_venta_id", referencedColumnName = "id", nullable = true)
@@ -28,16 +32,19 @@ public class Producto extends BaseEntidad{
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalles = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "producto_combo",
-            joinColumns = @JoinColumn(name = "producto_id"),
-            inverseJoinColumns = @JoinColumn(name = "combo_id"))
-    private Set<Combo> combos = new HashSet<>();
-
-
+@JsonIgnore
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Regalo> regalos = new ArrayList<>();
+    private List<DetalleRegalo> detallesRegalo;
+
+
+   @JsonBackReference
+   @JsonIgnore
+    @ManyToMany(mappedBy = "productos")
+    private List<Combo> combos = new ArrayList<>();
+
+
+   /* @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Regalo> regalos = new ArrayList<>();*/
 
 
 }

@@ -1,13 +1,12 @@
 package com.paquete.Bodega.services.serviceimpl;
 
 import com.paquete.Bodega.DTO.DetalleVentaDto;
+import com.paquete.Bodega.controller.DetalleVentaController;
+import com.paquete.Bodega.models.DetalleCombo;
 import com.paquete.Bodega.models.DetalleVenta;
 import com.paquete.Bodega.models.Producto;
 import com.paquete.Bodega.models.Venta;
-import com.paquete.Bodega.repository.BaseRepository;
-import com.paquete.Bodega.repository.DetalleVentaRepository;
-import com.paquete.Bodega.repository.ProductoRepository;
-import com.paquete.Bodega.repository.VentaRepository;
+import com.paquete.Bodega.repository.*;
 import com.paquete.Bodega.services.service.DetalleVentaService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +31,9 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
     @Autowired
     private VentaRepository ventaRepository;
 
+    @Autowired
+    private DetalleComboRepository detalleComboRepository;
+
 
 
     //Configuracion Necesaria
@@ -42,28 +44,12 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
 
 
 
-    public DetalleVenta crearDetalleVenta(DetalleVenta detalleVenta) throws Exception {
 
-        Producto productoExistente = productoRepository.findById(detalleVenta.getProducto().getId()).orElse(null);
-        if (productoExistente != null) {
-            detalleVenta.setProducto(productoExistente);
-        } else {
-            // Manejar el caso donde el producto no existe
-            throw new Exception("El producto no existe en la base de datos.");
-        }
-
-        if(productoExistente.getStock()<detalleVenta.getCantidad()) {
-            throw new Exception("No hay suficiente stock");
-        }
-
-        Double precioConCantidad=detalleVenta.getCantidad()*productoExistente.getPrecio();
-        detalleVenta.setSubTotal(precioConCantidad);
-
-        return detalleVentaRepository.save(detalleVenta);
-
-    }
     public DetalleVenta guardarDetalleVenta(DetalleVenta detalleVenta) {
         return detalleVentaRepository.save(detalleVenta);
+    }
+    public DetalleCombo guardarDetalleCombo(DetalleCombo detalleVenta) {
+        return detalleComboRepository.save(detalleVenta);
     }
 
 
@@ -85,6 +71,20 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
         throw new Exception("Detalle no encontrado en la venta con ID: " + idDetalle);
     }
     //si se elimina un detalle se debe reincorporar el stock lo mismo con venta ,
+
+    public DetalleCombo buscarDetalleComboEnVenta(Long idVenta ,Long idDetalle) throws Exception {
+        Venta venta = ventaRepository.findById(idVenta)
+                .orElseThrow(() -> new Exception("id no encontrado"));
+
+        List<DetalleCombo> detalles = venta.getDetalleCombos();
+        for (DetalleCombo detalle : detalles) {
+            if (detalle.getId()==idDetalle) {
+                return detalle;
+            }
+        }
+
+        throw new Exception("Detalle no encontrado en la venta con ID: " + idDetalle);
+    }
 
     public void eliminarDetalle(Long idVenta, Long idDetalle) throws Exception {
         Venta venta = ventaRepository.findById(idVenta)
@@ -118,13 +118,27 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
 
         for (DetalleVenta detalle : detalles) {
             if (detalle.getId()==(idDetalle)) {
+                Long idProducto = detalle.getProducto().getId();
+                Producto productoActualizado = productoRepository.findById(idProducto).orElseThrow(() -> new Exception("Producto no encontrado " + idProducto));
 
-                detalle.setCantidad(detalleActualizado.getCantidad());
+
+                int cantidadAnterior = detalle.getCantidad();
+                int cantidadNueva = detalleActualizado.getCantidad();
+                detalle.setCantidad(cantidadNueva);
                 detalle.setSubTotal(detalleActualizado.getSubTotal());
-
-
-
                 detalleVentaRepository.save(detalle);
+
+                int diferencia = cantidadNueva - cantidadAnterior;
+                int nuevoStock = productoActualizado.getStock() - diferencia;
+
+                if (nuevoStock < 0) {
+                    // Puedes lanzar una excepción o manejarlo de alguna otra manera
+                    throw new IllegalStateException("La cantidad actualizada excede el stock disponible para el producto con ID " + idProducto);
+                }
+                productoActualizado.setStock(nuevoStock);
+                productoRepository.save(productoActualizado);
+
+
                 return;
             }
         }

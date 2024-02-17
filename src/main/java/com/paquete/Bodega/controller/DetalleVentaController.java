@@ -1,7 +1,9 @@
 package com.paquete.Bodega.controller;
 
 import com.paquete.Bodega.models.Combo;
+import com.paquete.Bodega.models.DetalleCombo;
 import com.paquete.Bodega.models.DetalleVenta;
+import com.paquete.Bodega.repository.DetalleComboRepository;
 import com.paquete.Bodega.services.service.VentaService;
 import com.paquete.Bodega.services.serviceimpl.ComboServiceImpl;
 import com.paquete.Bodega.services.serviceimpl.DetalleVentaServiceImpl;
@@ -19,12 +21,23 @@ public class DetalleVentaController extends BaseControllerImpl<DetalleVenta, Det
     @Autowired
     private DetalleVentaServiceImpl detalleService;
 
+    @Autowired
+    DetalleComboRepository detalleComboRepository;
     @GetMapping("/{idVenta}/{idDetalle}")
-    public ResponseEntity<DetalleVenta> buscarDetalleEnVenta(
+    public ResponseEntity<Object> buscarDetalleEnVenta(
             @PathVariable Long idVenta,
             @PathVariable Long idDetalle) throws Exception {
-        DetalleVenta detalle = detalleService.buscarDetalleEnVenta(idVenta, idDetalle);
-        return new ResponseEntity<>(detalle, HttpStatus.OK);
+        boolean esDetalleCombo = detalleComboRepository.existsByVentaIdAndId(idVenta, idDetalle);
+
+        if (esDetalleCombo) {
+            // Si es un detalleCombo, realizar la lógica necesaria para obtener el detalleCombo
+            DetalleCombo detalleCombo = detalleService.buscarDetalleComboEnVenta(idVenta, idDetalle);
+            return new ResponseEntity<>(detalleCombo, HttpStatus.OK);
+        } else {
+            // Si es un detalle normal, realizar la lógica necesaria para obtener el detalle
+            DetalleVenta detalle = detalleService.buscarDetalleEnVenta(idVenta, idDetalle);
+            return new ResponseEntity<>(detalle, HttpStatus.OK);
+        }
     }
 
     @DeleteMapping("/{idVenta}/{idDetalle}")

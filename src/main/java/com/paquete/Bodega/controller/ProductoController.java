@@ -17,6 +17,26 @@ public class ProductoController extends BaseControllerImpl<Producto, ProductoSer
     @Autowired
     ProductoServiceImpl productoService;
 
+
+    @PostMapping("/guardar")
+    public ResponseEntity<?> guardarProducto(@RequestBody Producto producto) {
+        try {
+
+            Producto productoGuardado = productoService.guardarProducto(producto);
+
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(productoGuardado);
+        } catch (IllegalStateException e) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error: " + e.getMessage());
+        } catch (Exception e) {
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno al procesar la solicitud");
+        }
+    }
+
     @PutMapping("/a/{id}")
     public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto productoActualizado) {
         try {

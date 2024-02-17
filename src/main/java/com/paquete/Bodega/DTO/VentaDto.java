@@ -1,6 +1,7 @@
 package com.paquete.Bodega.DTO;
 
 import com.paquete.Bodega.Enum.FormaPago;
+import com.paquete.Bodega.models.Grupo;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Data;
@@ -14,7 +15,7 @@ public class VentaDto {
 
     @Enumerated(EnumType.STRING)
     private FormaPago formaPago;
-
+    private Long  grupoId;
     private Long tipoVentaId;
     private List<DetalleVentaDto> detalles;
 }

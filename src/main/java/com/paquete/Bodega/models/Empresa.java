@@ -18,7 +18,7 @@ import java.util.List;
 public class Empresa extends BaseEntidad{
 
     private String nombreEmpresa;
-
+    private Double comision;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "empresa_id", referencedColumnName = "id")
     private List<EmpleadoEmpresa> empleadoEmpresa = new ArrayList<>();

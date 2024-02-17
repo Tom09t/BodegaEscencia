@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -12,7 +16,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "Regalos")
 public class Regalo extends BaseEntidad{
 
-    @ManyToOne
-    @JoinColumn(name = "producto_id", nullable = true)
-    private Producto producto;
+
+    private Date fecha;
+    @OneToMany(mappedBy = "regalo", cascade = CascadeType.ALL, orphanRemoval = true)
+   private List<DetalleRegalo>detalleRegalos= new ArrayList<>();
+
 }

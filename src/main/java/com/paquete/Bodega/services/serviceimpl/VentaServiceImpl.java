@@ -1,24 +1,28 @@
 package com.paquete.Bodega.services.serviceimpl;
 
+import com.paquete.Bodega.DTO.ComboVentaDto;
 import com.paquete.Bodega.DTO.DetalleVentaDto;
+import com.paquete.Bodega.DTO.VentaComboDto;
 import com.paquete.Bodega.DTO.VentaDto;
-import com.paquete.Bodega.models.DetalleVenta;
-import com.paquete.Bodega.models.Producto;
-import com.paquete.Bodega.models.Venta;
-import com.paquete.Bodega.repository.BaseRepository;
-import com.paquete.Bodega.repository.DetalleVentaRepository;
-import com.paquete.Bodega.repository.ProductoRepository;
-import com.paquete.Bodega.repository.VentaRepository;
+import com.paquete.Bodega.models.*;
+import com.paquete.Bodega.repository.*;
 import com.paquete.Bodega.services.service.VentaService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements VentaService {
 
     //Inyeccion De dependencias
@@ -29,6 +33,10 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
     ProductoRepository productoRepository;
 
     @Autowired
+    GrupoRepository grupoRepository;
+    @Autowired
+    private DetalleComboRepository detalleComboRepository;
+    @Autowired
     private DetalleVentaServiceImpl detalleService;
 
     @Autowired
@@ -37,6 +45,14 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
     @Autowired
     private DetalleVentaRepository detalleVentaRepository;
 
+    @Autowired
+    private ComboServiceImpl comboService;
+
+
+
+    @Autowired
+    ComboRepository comboRepository;
+
     //Configuraciones necesarias
     public VentaServiceImpl(BaseRepository<Venta, Long> baseRepository, VentaRepository ventaRepository) {
         super(baseRepository);
@@ -44,50 +60,25 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
     }
 
 
-   /* public Venta crearVenta(List<DetalleVenta> detalles) throws Exception {
-        if (detalles == null || detalles.isEmpty()) {
-            throw new Exception("La lista de detalles no puede estar vacía");
-        }
 
-        // Crea una nueva venta y asocia los detalles
-        Venta venta = new Venta();
-        venta.setFechaVenta(new Date());
+   public Venta crearVentaConDetalles(VentaDto ventaDTO) throws Exception {
 
+       Long grupoId = ventaDTO.getGrupoId();
 
-        List<DetalleVenta> detallesGuardados = new ArrayList<>();
+       Grupo grupoExistente = grupoRepository.findById(grupoId)
+               .orElseThrow(() -> new Exception("No se encontró el grupo con ID: " + grupoId));
 
-        // Crea y guarda cada detalle individualmente
-        for (DetalleVenta detalle : detalles) {
-            DetalleVenta detalleGuardado = detalleService.crearDetalleVenta(detalle);
-            detallesGuardados.add(detalleGuardado);
-        }
-
-        // Establece la lista de detalles en la venta
-        venta.setDetalles(new ArrayList<>(detallesGuardados));
-
-        // Calcula el total de la venta sumando los subtotales de los detalles
-        Double totalVenta = detallesGuardados.stream()
-                .mapToDouble(DetalleVenta::getSubTotal)
-                .sum();
-
-        venta.setMontoVenta(totalVenta);
-
-        // Guarda la venta en la base de datos
-        Venta ventaguardada=ventaRepository.save(venta);
-
-        return ventaguardada;
-    }*/
-   public Venta crearVentaConDetalles(VentaDto ventaDTO) {
        Venta nuevaVenta = new Venta();
        nuevaVenta.setFechaVenta(ventaDTO.getFechaVenta());
        nuevaVenta.setFormaPago(ventaDTO.getFormaPago());
-
+       nuevaVenta.setGrupo(grupoExistente);
 
        Venta ventaGuardada = ventaRepository.save(nuevaVenta);
 
-       // Crear y asociar detalles de venta
-       List<DetalleVenta> detalles = new ArrayList<>();
+
        for (DetalleVentaDto detalleDTO : ventaDTO.getDetalles()) {
+
+
            DetalleVenta detalleVenta = new DetalleVenta();
            detalleVenta.setCantidad(detalleDTO.getCantidad());
 
@@ -100,11 +91,43 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
 
 
 
-
-
            // Guardar detalles de venta
            detalleService.guardarDetalleVenta(detalleVenta);
        }
+
+       boolean esCombo = comboService.verificarComboEnVenta(ventaDTO.getDetalles());
+       if(esCombo==false){
+           ventaGuardada.setEsCombo(false);
+           ventaGuardada.setNombreCombo("no contiene combo");
+       }
+       List<Long> comboIds = comboService.obtenerCombosEnVenta(ventaDTO.getDetalles());
+       if (!comboIds.isEmpty()) {
+           if (comboIds.size() == 1) {
+               // Un solo combo encontrado
+               Long comboId = comboIds.get(0);
+               Combo combo = comboRepository.findById(comboId).orElse(null);
+
+               ventaGuardada.setEsCombo(true);
+               ventaGuardada.setNombreCombo("Esta venta tiene una combinacion de productos que pertenece al combo "
+                       + combo.getNombreCombo() + " con el id " + combo.getId());
+
+           } else {
+               // Más de un combo encontrado
+               ventaGuardada.setEsCombo(true);
+               List<String> nombresCombos = new ArrayList<>();
+               for (Long comboId : comboIds) {
+                   Combo combo = comboRepository.findById(comboId).orElse(null);
+
+                   if (combo != null) {
+                       nombresCombos.add(combo.getNombreCombo() + " (ID: " + combo.getId() + ")");
+                   }
+               }
+               ventaGuardada.setNombreCombo("ESTA VENTA CONTIENE VARIOS COMBOS: " + String.join(", ", nombresCombos));
+
+           }
+       }
+
+
        double montoVenta = ventaDTO.getDetalles().stream()
                .mapToDouble(detalleDTO -> detalleDTO.getCantidad() * productoRepository.findById(detalleDTO.getProductoId()).orElse(null).getPrecio())
                .sum();
@@ -114,9 +137,57 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
        ventaRepository.save(ventaGuardada);
 
        return ventaGuardada;
-   }
+    }
+    public Venta procesarVentaConCombos(VentaComboDto ventaDTO) throws Exception {
+        Long grupoId = ventaDTO.getGrupoId();
+        Grupo grupoExistente = grupoRepository.findById(grupoId)
+                .orElseThrow(() -> new Exception("No se encontró el grupo con ID: " + grupoId));
+        Venta nuevaVenta = new Venta();
+        nuevaVenta.setFechaVenta(ventaDTO.getFechaVenta());
+        nuevaVenta.setFormaPago(ventaDTO.getFormaPago());
+        nuevaVenta.setGrupo(grupoExistente);
 
-    public void eliminarVenta(Long idVenta) throws Exception {
+        Venta ventaGuardada = ventaRepository.save(nuevaVenta);
+
+        List<DetalleCombo> detalles = new ArrayList<>();
+
+        for (ComboVentaDto comboVentaDto : ventaDTO.getCombos()) {
+            DetalleCombo detalleCombo = new DetalleCombo();
+            Combo combo = comboRepository.findById(comboVentaDto.getComboId())
+                    .orElseThrow(() -> new Exception("Combo con ID " + comboVentaDto.getComboId() + " no encontrado."));
+
+            detalleCombo.setVenta(ventaGuardada);
+            detalleCombo.setCombo(combo);
+            detalleCombo.setCantidad(comboVentaDto.getCantidad());
+
+            // Guardar detalle de combo
+            detalleService.guardarDetalleCombo(detalleCombo);
+
+        }
+        double montoTotalVenta = ventaDTO.getCombos().stream()
+                .mapToDouble(comboVentaDto -> {
+                    Combo combo = comboRepository.findById(comboVentaDto.getComboId()).orElse(null);
+                    if (combo != null && combo.getPrecioTotal() != null) {
+                        return combo.getPrecioTotal() * comboVentaDto.getCantidad();
+                    }
+                    return 0.0;
+                })
+                .sum();
+
+        // Actualizar y guardar la venta con el monto total
+        ventaGuardada.setMontoVenta(montoTotalVenta);
+        ventaRepository.save(ventaGuardada);
+
+
+        return ventaGuardada;
+
+    }
+
+
+
+
+
+       public void eliminarVenta(Long idVenta) throws Exception {
         Venta venta = ventaRepository.findById(idVenta)
                 .orElseThrow(() -> new Exception("Venta no encontrada con ID: " + idVenta));
 
@@ -125,7 +196,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
         for (DetalleVenta detalle : detalles) {
             Producto producto = detalle.getProducto();
 
-            // Restar la cantidad del detalle al stock del producto
+
             if (producto != null) {
                 producto.setStock(producto.getStock() + detalle.getCantidad());
                  productoRepository.save(producto);
@@ -138,6 +209,9 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
         // Eliminar la venta de la base de datos
         ventaRepository.deleteById(idVenta);
     }
+
+
+
 
 
 
