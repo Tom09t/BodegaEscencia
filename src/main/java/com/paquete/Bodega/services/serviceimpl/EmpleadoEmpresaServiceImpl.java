@@ -28,6 +28,10 @@ public class EmpleadoEmpresaServiceImpl extends BaseServiceImpl<EmpleadoEmpresa,
         this.empleadoEmpresaRepository = empleadoEmpresaRepository;
     }
 
+
+
+
+
     public void eliminarEmpleadoEmpresa(Long empleadoId, Long empresaId) throws Exception {
         Optional<Empresa> optionalEmpresa = empresaRepository.findById(empresaId);
         if (optionalEmpresa.isPresent()) {

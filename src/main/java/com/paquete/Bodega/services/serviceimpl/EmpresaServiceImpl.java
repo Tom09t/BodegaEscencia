@@ -36,10 +36,17 @@ public class EmpresaServiceImpl extends BaseServiceImpl<Empresa, Long> implement
 
 
 
-public Empresa crearEmpresaConEmpleados (NuevaEmpresaDto nuevaEmpresaDto){
+public Empresa crearEmpresaConEmpleados (NuevaEmpresaDto nuevaEmpresaDto) throws Exception {
+
+    if (empresaRepository.existsByNombreEmpresa(nuevaEmpresaDto.getNombreEmpresa())) {
+        throw new Exception("Ya existe un Combo con el nombre: " + nuevaEmpresaDto.getNombreEmpresa());
+    }
+
+
+
         Empresa empresa = new Empresa();
         empresa.setNombreEmpresa(nuevaEmpresaDto.getNombreEmpresa());
-
+        empresa.setComision(nuevaEmpresaDto.getComision());
         List<EmpleadoEmpresa>empleadoEmpresas= new ArrayList<>();
 
     for(EmpleadoEmpresa empleadoEmpresa : nuevaEmpresaDto.getEmpleadoEmpresa()) {
@@ -83,6 +90,8 @@ public Empresa crearEmpresaConEmpleados (NuevaEmpresaDto nuevaEmpresaDto){
             return null; // O manejar según tus necesidades
         }
     }
+
+
     public EmpleadoEmpresa agregarEmpleado(Long empresaId, EmpleadoEmpresa empleadoEmpresa) {
         Optional<Empresa> empresaExistenteOptional = empresaRepository.findById(empresaId);
 

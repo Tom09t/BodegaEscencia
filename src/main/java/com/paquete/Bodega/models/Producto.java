@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -19,10 +20,14 @@ public class Producto extends BaseEntidad{
 
     private Date fechaBajaProducto;
     @Column(name = "nombre")
+    @NotNull
     private String nombreProducto;
+    @NotNull
     private Double precio;
+    @NotNull
     private int stock;
     @Column(name = "stock_regalo")
+    @NotNull
     private int stockRegalo;
 
    /* @ManyToOne(fetch = FetchType.EAGER)

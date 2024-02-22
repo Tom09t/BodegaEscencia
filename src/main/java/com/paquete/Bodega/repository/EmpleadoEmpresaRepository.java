@@ -8,5 +8,5 @@ import java.util.Optional;
 @Repository
 public interface EmpleadoEmpresaRepository extends BaseRepository<EmpleadoEmpresa,Long>{
 
-
+    boolean existsByNombreEmpleado(String nombreEmpleado);
 }

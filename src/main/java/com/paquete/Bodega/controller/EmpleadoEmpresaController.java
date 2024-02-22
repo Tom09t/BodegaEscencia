@@ -18,6 +18,9 @@ public class EmpleadoEmpresaController extends BaseControllerImpl<EmpleadoEmpres
     @Autowired
     EmpleadoEmpresaRepository empleadoEmpresaRepository;
 
+
+
+
     @PostMapping("/nuevoEmpleado")
     public ResponseEntity<?> nuevoEmpleado(@RequestParam String nombre, @RequestParam Double comision) {
         try {
@@ -43,4 +46,6 @@ public class EmpleadoEmpresaController extends BaseControllerImpl<EmpleadoEmpres
             return ResponseEntity.status(500).body(e.getMessage());
         }
     }
+
+
 }

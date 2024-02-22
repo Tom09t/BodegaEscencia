@@ -1,6 +1,7 @@
 package com.paquete.Bodega.services.serviceimpl;
 
 
+import com.paquete.Bodega.models.Combo;
 import com.paquete.Bodega.models.Producto;
 import com.paquete.Bodega.repository.BaseRepository;
 import com.paquete.Bodega.repository.ProductoRepository;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class ProductoServiceImpl extends BaseServiceImpl<Producto,Long> implements ProductoService{
@@ -24,6 +26,10 @@ public class ProductoServiceImpl extends BaseServiceImpl<Producto,Long> implemen
     }
 
     public Producto guardarProducto(Producto producto) {
+        if (productoRepository.existsByNombreProducto(producto.getNombreProducto())) {
+            throw new IllegalStateException("Ya existe un producto con el nombre: " + producto.getNombreProducto());
+        }
+
         int stockActual = producto.getStock();
         int stockRegalo = producto.getStockRegalo();
 
@@ -46,18 +52,40 @@ public class ProductoServiceImpl extends BaseServiceImpl<Producto,Long> implemen
     }
 
 
-    public void actualizarStock(Long productoId, int cantidad) {
+    public boolean actualizarStock(Long productoId, int cantidad) {
         Producto producto = productoRepository.findById(productoId).orElseThrow(() -> new NoSuchElementException("Producto no encontrado"));
 
         // Actualizar el stock
         int nuevoStock = producto.getStock() - cantidad;
         if (nuevoStock < 0) {
-            throw new IllegalStateException("Stock insuficiente");
+          return false;
         }
 
         producto.setStock(nuevoStock);
         productoRepository.save(producto);
+        return true;
     }
+
+    public void aumentarStock(Long productoId, int cantidad) {
+        // Obtener el producto por ID
+        Optional<Producto> productoOptional = productoRepository.findById(productoId);
+
+        // Verificar si el producto existe
+        if (productoOptional.isPresent()) {
+            Producto producto = productoOptional.get();
+
+            // Incrementar el stock del producto
+            int nuevoStock = producto.getStock() + cantidad;
+            producto.setStock(nuevoStock);
+
+            // Guardar el producto actualizado en la base de datos
+            productoRepository.save(producto);
+        } else {
+            // Manejar la situación donde el producto no existe (lanzar excepción o realizar alguna otra acción)
+        }
+    }
+
+
     public void actualizarStockRegalo(Long productoId, int cantidad) {
         Producto producto = productoRepository.findById(productoId).orElseThrow(() -> new NoSuchElementException("Producto no encontrado"));
 

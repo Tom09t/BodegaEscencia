@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -14,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 public class NuevaEmpresaDto {
     private String nombreEmpresa;
+    @NotNull
+    private double comision;
     private List<EmpleadoEmpresa> empleadoEmpresa;
 
 }

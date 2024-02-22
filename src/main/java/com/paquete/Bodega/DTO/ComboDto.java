@@ -16,8 +16,8 @@ import java.util.Set;
 public class ComboDto {
     private String nombreCombo;
     private List<Long> productosIds;
-    private int cantidad1;
-    private int cantidad2;
-    private int cantidad3;
+    private Integer cantidad1;
+    private Integer cantidad2;
+    private Integer cantidad3;
 
 }

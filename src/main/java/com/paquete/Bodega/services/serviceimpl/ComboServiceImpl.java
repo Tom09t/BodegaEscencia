@@ -33,6 +33,9 @@ public class ComboServiceImpl extends BaseServiceImpl<Combo,Long> implements Com
 
     public Combo guardarCombo(ComboDto comboDTO) throws Exception {
 
+        if (comboRepository.existsByNombreCombo(comboDTO.getNombreCombo())) {
+            throw new Exception("Ya existe un Combo con el nombre: " + comboDTO.getNombreCombo());
+        }
      double precio1;
      double precio2;
      double precio3;
@@ -60,15 +63,28 @@ public class ComboServiceImpl extends BaseServiceImpl<Combo,Long> implements Com
     precio2=producto2.getPrecio()*comboDTO.getCantidad2();
     precio3=producto3.getPrecio()*comboDTO.getCantidad3();
 
+        int cantidad1 = comboDTO.getCantidad1();
+        int cantidad2 = comboDTO.getCantidad2();
+        int cantidad3 = comboDTO.getCantidad3();
+
+  List<Integer>cantidadesXproductos= new ArrayList<>();
+        cantidadesXproductos.add(cantidad1);
+        cantidadesXproductos.add(cantidad2);
+        cantidadesXproductos.add(cantidad3);
+
     double total=precio1+precio2+precio3;
         // Guardar el combo y sus relaciones
         Combo combo = new Combo();
+
         combo.setNombreCombo(comboDTO.getNombreCombo());
         combo.setProductos(new ArrayList<>(productosCombo));
         combo.setPrecioTotal(total);
+        combo.setCantidadesXproductos(cantidadesXproductos);
 
         return comboRepository.save(combo);
     }
+
+
     public List<Long> obtenerCombosEnVenta(List<DetalleVentaDto> detallesVenta) {
         // Obtener todos los combos existentes
         List<Combo> combos = comboRepository.findAll();
@@ -88,8 +104,23 @@ public class ComboServiceImpl extends BaseServiceImpl<Combo,Long> implements Com
         List<Long> productosComboIds = combo.getProductos().stream().map(Producto::getId).collect(Collectors.toList());
         List<Long> productosVentaIds = detallesVenta.stream().map(DetalleVentaDto::getProductoId).collect(Collectors.toList());
 
+        if (!productosVentaIds.containsAll(productosComboIds)) {
+            return false;
+        }
+        for (int i = 0; i < productosComboIds.size(); i++) {
+            Long productoId = productosComboIds.get(i);
+            int cantidadCombo = combo.getCantidadesXproductos().get(i);
+            int cantidadVenta = detallesVenta.stream()
+                    .filter(detalle -> detalle.getProductoId().equals(productoId))
+                    .mapToInt(DetalleVentaDto::getCantidad)
+                    .sum();
+
+            if (cantidadCombo != cantidadVenta) {
+                return false;
+            }
+        }
         // Verificar si todos los productos del combo están presentes en la venta
-        return productosVentaIds.containsAll(productosComboIds);
+        return true;
     }
 
 

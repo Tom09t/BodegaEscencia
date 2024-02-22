@@ -21,33 +21,31 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
     private VentaServiceImpl  ventaService;
 
     @PostMapping("/guardar")
-    public ResponseEntity<String> crearVentaConDetalles(@RequestBody VentaDto ventaDto) {
+    public ResponseEntity<Venta> crearVentaConDetalles(@RequestBody VentaDto ventaDto) {
         try {
             Venta venta = ventaService.crearVentaConDetalles(ventaDto);
-            return new ResponseEntity<>("Venta creada exitosamente con ID: " + venta.getId(), HttpStatus.CREATED);
+            return ResponseEntity.ok().body(venta);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error al crear la venta: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
+
+    @GetMapping("/fechas")
+    public ResponseEntity<List<Venta>> ventasHistorial() {
+        List<Venta> ventasFechas = ventaService.obtenerVentasOrdenadasPorFechaDesc();
+        return ResponseEntity.ok().body(ventasFechas);
+    }
+
 
     @DeleteMapping("/e/{id}")
-    public ResponseEntity<String>eliminarVenta(@PathVariable Long idVenta) throws Exception {
-
-        ventaService.eliminarVenta(idVenta);
-        String mensaje = "venta eliminada con id "+ idVenta;
+    public ResponseEntity<String> eliminarVenta(@PathVariable Long id) throws Exception {
+        ventaService.eliminarVenta(id);
+        String mensaje = "Venta eliminada con id " + id;
         return ResponseEntity.ok(mensaje);
-
     }
 
-    @PostMapping("/ventaCombo")
-    public ResponseEntity<?> crearVentaConCombos(@RequestBody VentaComboDto ventaDTO) {
-        try {
-            Venta ventaGuardada = ventaService.procesarVentaConCombos(ventaDTO);
-            return ResponseEntity.ok(ventaGuardada);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
+
+
 
 
 

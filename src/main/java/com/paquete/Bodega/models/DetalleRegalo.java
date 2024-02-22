@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 @Table(name = "detalle_regalo")
@@ -26,6 +27,7 @@ public class DetalleRegalo extends BaseEntidad{
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
+    @NotNull
     private int cantidad;
 
 

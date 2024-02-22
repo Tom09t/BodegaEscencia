@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +20,14 @@ import java.util.List;
 @Table(name = "Grupo")
 public class Grupo extends BaseEntidad{
 
+    @NotNull
     private double montoGrupo;
+    @NotNull
     private int comensales;
+    @NotNull
     private EstadoGrupo estadoGrupo;
 
+    @NotNull
     private Double montoMesa;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "empresa_id", referencedColumnName = "id")

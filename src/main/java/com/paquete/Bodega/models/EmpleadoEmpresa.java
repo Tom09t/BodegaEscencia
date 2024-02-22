@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 @NoArgsConstructor
@@ -16,7 +17,9 @@ import lombok.NoArgsConstructor;
 public class EmpleadoEmpresa extends BaseEntidad{
 
     @Column(name = "nombre_empleado", nullable = false)
+    @NotNull
     private String nombreEmpleado;
+    @NotNull
     private double comision;
 
 

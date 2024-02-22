@@ -1,16 +1,15 @@
 package com.paquete.Bodega.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -19,8 +18,10 @@ import java.util.Set;
 @Table(name = "combos")
 public class Combo extends BaseEntidad{
 
+    @NotNull
     private String nombreCombo;
 
+    @NotNull
     private Double precioTotal;
     @JsonManagedReference
     @ManyToMany
@@ -29,6 +30,11 @@ public class Combo extends BaseEntidad{
             joinColumns = @JoinColumn(name = "combo_id"),
             inverseJoinColumns = @JoinColumn(name = "producto_id"))
     private List<Producto> productos = new ArrayList<>();
+
+    private List<Integer> cantidadesXproductos =new ArrayList<>();
+
+
+
 
 
 

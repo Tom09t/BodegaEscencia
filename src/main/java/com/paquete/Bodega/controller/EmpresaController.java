@@ -28,10 +28,11 @@ public class EmpresaController extends BaseControllerImpl<Empresa, EmpresaServic
     @Autowired
     private EmpleadoEmpresaServiceImpl empleadoEmpresaService;
     @PostMapping("/nuevaEmpresa")
-    public ResponseEntity<Empresa> crearEmpresaConEmpleados(@RequestBody NuevaEmpresaDto nuevaEmpresaDto) {
+    public ResponseEntity<Empresa> crearEmpresaConEmpleados(@RequestBody NuevaEmpresaDto nuevaEmpresaDto) throws Exception {
         Empresa empresaCreada = empresaService.crearEmpresaConEmpleados(nuevaEmpresaDto);
         return new ResponseEntity<>(empresaCreada, HttpStatus.CREATED);
     }
+
 
 
     @DeleteMapping("/{empresaId}/empleados/{empleadoId}")

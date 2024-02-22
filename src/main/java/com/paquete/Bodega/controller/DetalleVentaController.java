@@ -41,22 +41,46 @@ public class DetalleVentaController extends BaseControllerImpl<DetalleVenta, Det
     }
 
     @DeleteMapping("/{idVenta}/{idDetalle}")
-    public ResponseEntity<String>eliminarDetalleDeVenta (
+    public ResponseEntity<String> eliminarDetalleDeVenta(
             @PathVariable Long idVenta,
             @PathVariable Long idDetalle) throws Exception {
+        boolean esDetalleCombo = detalleComboRepository.existsByVentaIdAndId(idVenta, idDetalle);
+        System.out.println("¿Es un detalleCombo?: " + esDetalleCombo);
+        if (esDetalleCombo) {
+            detalleService.eliminarDetalleCombo(idVenta, idDetalle);
+            String mensaje = "Detalle con ID " + idDetalle + " eliminado de la venta con ID " + idVenta;
+            return ResponseEntity.ok(mensaje);
+        }
 
-        detalleService.eliminarDetalle(idVenta,idDetalle);
+        detalleService.eliminarDetalle(idVenta, idDetalle);
         String mensaje = "Detalle con ID " + idDetalle + " eliminado de la venta con ID " + idVenta;
         return ResponseEntity.ok(mensaje);
-
     }
+
     @PutMapping("/{idVenta}/{idDetalle}")
     public ResponseEntity<String> actualizarDetalleVenta(
             @PathVariable Long idVenta,
             @PathVariable Long idDetalle,
             @RequestBody DetalleVenta detalleActualizado) {
         try {
+
             detalleService.actualizarDetalleVenta(idVenta, idDetalle, detalleActualizado);
+            String mensaje = "Detalle de venta con ID " + idDetalle + " actualizado en la venta con ID " + idVenta;
+            return ResponseEntity.ok(mensaje);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+
+    @PutMapping("/c/{idVenta}/{idDetalle}")
+    public ResponseEntity<String> actualizarDetalleCombo(
+            @PathVariable Long idVenta,
+            @PathVariable Long idDetalle,
+            @RequestBody DetalleCombo detalleActualizado) {
+        try {
+
+            detalleService.actualizarDetalleCombo(idVenta, idDetalle, detalleActualizado);
             String mensaje = "Detalle de venta con ID " + idDetalle + " actualizado en la venta con ID " + idVenta;
             return ResponseEntity.ok(mensaje);
         } catch (Exception e) {

@@ -7,6 +7,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 @Data
@@ -20,8 +21,11 @@ public class DetalleCombo extends BaseEntidad{
 
     @ManyToOne
     @JoinColumn(name = "combo_id")
+    @NotNull
     private Combo combo;
+    private Double subTotal;
 
+    @NotNull
     private int cantidad;
 
 
