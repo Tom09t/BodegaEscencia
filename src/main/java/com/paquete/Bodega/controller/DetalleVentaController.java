@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/detallesVentas")
@@ -72,6 +74,12 @@ public class DetalleVentaController extends BaseControllerImpl<DetalleVenta, Det
         }
     }
 
+@GetMapping("/d/{id}")
+public ResponseEntity<List<DetalleVenta>>obtenerDetalles(@PathVariable Long id){
+        List<DetalleVenta>detalleVentas=detalleService.listaDetalle(id);
+        return ResponseEntity.ok(detalleVentas);
+
+}
 
     @PutMapping("/c/{idVenta}/{idDetalle}")
     public ResponseEntity<String> actualizarDetalleCombo(

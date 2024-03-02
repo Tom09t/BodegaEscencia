@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -263,7 +264,18 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
 
 
 
+    public List<Venta> listarVentaDeGrupo(Long id){
+        Grupo grupo = grupoRepository.findById(id).orElse(null);
 
+        if (grupo != null) {
+            List<Venta> ventasObtenidas = grupo.getVentas();
+            System.out.println("Ventas obtenidas: " + ventasObtenidas.size());
+            return ventasObtenidas;
+        } else {
+            System.out.println("Grupo no encontrado");
+            return Collections.emptyList();
+        }
+    }
 
 
 

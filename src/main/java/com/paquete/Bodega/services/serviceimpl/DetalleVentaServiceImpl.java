@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -55,6 +52,18 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
         return detalleComboRepository.save(detalleVenta);
     }
 
+
+    public List<DetalleVenta>listaDetalle(Long idVenta){
+        Venta venta= ventaRepository.findById(idVenta).orElse(null);
+        if(venta!=null){
+            List<DetalleVenta>detallesObtenidos=venta.getDetalles();
+            return detallesObtenidos;
+
+        }else {
+            System.out.println("Ventano encontrado");
+            return Collections.emptyList();
+        }
+    }
 
     public DetalleVenta buscarDetalleEnVenta(Long idVenta, Long idDetalle) throws Exception {
         Venta venta = ventaRepository.findById(idVenta)

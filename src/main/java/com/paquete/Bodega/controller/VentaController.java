@@ -30,6 +30,13 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
         }
     }
 
+
+    @GetMapping("/grupo/{id}")
+    public ResponseEntity<List<Venta>> obtenerVentasDeGrupo(@PathVariable Long id) {
+        List<Venta> ventas = ventaService.listarVentaDeGrupo(id);
+        return ResponseEntity.ok(ventas);
+    }
+
     @GetMapping("/fechas")
     public ResponseEntity<List<Venta>> ventasHistorial() {
         List<Venta> ventasFechas = ventaService.obtenerVentasOrdenadasPorFechaDesc();

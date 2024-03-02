@@ -18,9 +18,9 @@ import java.util.List;
 @Table(name = "Empresa")
 public class Empresa extends BaseEntidad{
 
-    @NotNull
+
     private String nombreEmpresa;
-    @NotNull
+
     private Double comision;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "empresa_id", referencedColumnName = "id")

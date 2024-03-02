@@ -3,6 +3,8 @@ import com.paquete.Bodega.DTO.NuevoGrupoDto;
 import com.paquete.Bodega.Enum.EstadoGrupo;
 import com.paquete.Bodega.models.Empresa;
 import com.paquete.Bodega.models.Grupo;
+import com.paquete.Bodega.models.Producto;
+import com.paquete.Bodega.models.Venta;
 import com.paquete.Bodega.repository.EmpresaRepository;
 import com.paquete.Bodega.services.serviceimpl.GrupoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +26,24 @@ public class GrupoController extends BaseControllerImpl<Grupo, GrupoServiceImpl>
 private GrupoServiceImpl grupoService;
 
 
+
     @GetMapping("/list")
     public ResponseEntity<List<Grupo>> obtenerGruposConTotales() {
         List<Grupo> gruposConTotales = grupoService.listarGrupos();
         return new ResponseEntity<>(gruposConTotales, HttpStatus.OK);
     }
+
+    @PutMapping("/{id}/a")
+    public ResponseEntity<?> actualizarGrupo(@PathVariable Long id, @RequestBody NuevoGrupoDto grupoRequest) {
+        Grupo grupoActualizado = grupoService.actualizarGrupo(id, grupoRequest);
+
+        if (grupoActualizado != null) {
+            return new ResponseEntity<>(grupoActualizado, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("No se encontró el grupo con ID: " + id, HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 
 

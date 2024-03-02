@@ -1,5 +1,7 @@
 package com.paquete.Bodega.services.serviceimpl;
 
+import com.paquete.Bodega.DTO.NuevoGrupoDto;
+import com.paquete.Bodega.Enum.EstadoGrupo;
 import com.paquete.Bodega.models.Empresa;
 import com.paquete.Bodega.models.Grupo;
 import com.paquete.Bodega.models.Venta;
@@ -45,5 +47,29 @@ for(Grupo grupo:grupos){
 }
 return grupos;
     }
+
+
+    public Grupo actualizarGrupo(Long id, NuevoGrupoDto grupoRequest) {
+        Grupo grupoExistente = grupoRepository.findById(id).orElse(null);
+
+        if (grupoExistente != null) {
+            if (grupoRequest.getEstadoGrupo() != null) {
+                grupoExistente.setEstadoGrupo(grupoRequest.getEstadoGrupo());
+            }
+
+            if (grupoRequest.getTotalMesa()!= null) {
+                grupoExistente.setMontoMesa(grupoRequest.getTotalMesa());
+            }
+
+            if (grupoRequest.getComensales() != null) {
+                grupoExistente.setComensales(grupoRequest.getComensales());
+            }
+
+            return grupoRepository.save(grupoExistente);
+        }
+
+        return null;
+    }
+
 
 }
