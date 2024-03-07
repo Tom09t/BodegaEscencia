@@ -3,6 +3,7 @@ package com.paquete.Bodega.controller;
 import com.paquete.Bodega.models.Combo;
 import com.paquete.Bodega.models.DetalleCombo;
 import com.paquete.Bodega.models.DetalleVenta;
+import com.paquete.Bodega.models.Venta;
 import com.paquete.Bodega.repository.DetalleComboRepository;
 import com.paquete.Bodega.services.service.VentaService;
 import com.paquete.Bodega.services.serviceimpl.ComboServiceImpl;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -44,6 +46,7 @@ public class DetalleVentaController extends BaseControllerImpl<DetalleVenta, Det
 
     @DeleteMapping("/{idVenta}/{idDetalle}")
     public ResponseEntity<String> eliminarDetalleDeVenta(
+
             @PathVariable Long idVenta,
             @PathVariable Long idDetalle) throws Exception {
         boolean esDetalleCombo = detalleComboRepository.existsByVentaIdAndId(idVenta, idDetalle);
@@ -78,6 +81,14 @@ public class DetalleVentaController extends BaseControllerImpl<DetalleVenta, Det
 public ResponseEntity<List<DetalleVenta>>obtenerDetalles(@PathVariable Long id){
         List<DetalleVenta>detalleVentas=detalleService.listaDetalle(id);
         return ResponseEntity.ok(detalleVentas);
+
+}
+
+
+    @GetMapping("/dc/{id}")
+public ResponseEntity<List<DetalleCombo>>obtenerDetallesCombo(@PathVariable Long id){
+    List<DetalleCombo>detalleCombos=detalleService.listaDetalleCombo(id);
+    return ResponseEntity.ok(detalleCombos);
 
 }
 
