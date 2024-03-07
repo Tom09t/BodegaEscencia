@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.Serializable;
 
+
 public interface BaseController <E extends BaseEntidad, ID extends Serializable> {
 
     public ResponseEntity<?> getAll();

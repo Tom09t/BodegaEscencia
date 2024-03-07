@@ -18,14 +18,23 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping("/grupos")
 public class GrupoController extends BaseControllerImpl<Grupo, GrupoServiceImpl>{
 
 @Autowired
 private GrupoServiceImpl grupoService;
 
-
+    @PostMapping("/CrearNuevoGrupo")
+    public ResponseEntity<?> crearNuevoGrupo(@RequestBody NuevoGrupoDto nuevoGrupoDto){
+        try{
+            grupoService.crearGrupo(nuevoGrupoDto);
+            return ResponseEntity.ok("Grupo creado exitosamente");
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al crear el grupo: " + e.getMessage());
+        }
+    }
 
     @GetMapping("/list")
     public ResponseEntity<List<Grupo>> obtenerGruposConTotales() {

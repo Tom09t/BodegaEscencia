@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -25,6 +26,9 @@ public class GrupoServiceImpl extends BaseServiceImpl<Grupo, Long> implements Gr
 
     @Autowired
     private VentaRepository ventaRepository;
+
+    @Autowired
+    private EmpresaRepository empresaRepository;
 
     //Configuracion Necesaria
     public GrupoServiceImpl(BaseRepository<Grupo, Long> baseRepository, GrupoRepository grupoRepository) {
@@ -38,13 +42,13 @@ public class GrupoServiceImpl extends BaseServiceImpl<Grupo, Long> implements Gr
 
        List<Grupo>grupos=grupoRepository.findAll();
 
-for(Grupo grupo:grupos){
+    for(Grupo grupo:grupos){
 
-    double totalVentas=grupo.getVentas().stream()
+            double totalVentas=grupo.getVentas().stream()
             .mapToDouble(Venta::getMontoVenta)
             .sum();
-    grupo.setMontoGrupo(totalVentas);
-}
+                grupo.setMontoGrupo(totalVentas);
+    }
 return grupos;
     }
 
@@ -72,4 +76,30 @@ return grupos;
     }
 
 
+    public void crearGrupo(NuevoGrupoDto nuevoGrupoDto) {
+        // Buscar la empresa por su id
+        Optional<Empresa> optionalEmpresa = empresaRepository.findById(nuevoGrupoDto.getEmpresa());
+
+        // Verificar si la empresa existe antes de proceder
+        if (optionalEmpresa.isPresent()) {
+            // Obtener la empresa desde el Optional
+            Empresa empresa = optionalEmpresa.get();
+
+            // CrearGrupoConBuilder
+            Grupo nuevoGrupo = Grupo.builder()
+                    .comensales(nuevoGrupoDto.getComensales())
+                    .empresa(empresa)
+                    .estadoGrupo(EstadoGrupo.ABIERTO)
+                    .montoGrupo(0)
+                    .montoMesa(0.0)
+                    // Agrega otros atributos del grupo según tus necesidades
+                    .build();
+
+            // Guardar el grupo en la base de datos
+            grupoRepository.save(nuevoGrupo);
+        } else {
+            // Manejar el caso en que la empresa no existe (lanzar excepción, devolver un mensaje de error, etc.)
+            throw new Error("No se encontró la empresa con el ID proporcionado");
+        }
+    }
 }
