@@ -65,6 +65,20 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
         }
     }
 
+    public List<DetalleCombo>listaDetalleCombo(Long idVenta){
+        Venta venta= ventaRepository.findById(idVenta).orElse(null);
+        if(venta!=null){
+            List<DetalleCombo>detallesObtenidos=venta.getDetalleCombos();
+            return detallesObtenidos;
+
+        }else {
+            System.out.println("Ventano encontrado");
+            return Collections.emptyList();
+        }
+    }
+
+
+
     public DetalleVenta buscarDetalleEnVenta(Long idVenta, Long idDetalle) throws Exception {
         Venta venta = ventaRepository.findById(idVenta)
                 .orElseThrow(() -> new Exception("id no encontrado"));
@@ -143,7 +157,11 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
     }
 
 
-    public void eliminarDetalle(Long idVenta, Long idDetalle) throws Exception {
+    public void eliminarDetalle( Long idVenta, Long idDetalle) throws Exception {
+
+
+
+
         Venta venta = ventaRepository.findById(idVenta)
                 .orElseThrow(() -> new Exception("Venta no encontrada con ID: " + idVenta));
 
