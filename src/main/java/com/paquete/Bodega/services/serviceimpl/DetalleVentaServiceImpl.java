@@ -35,7 +35,6 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
     ComboRepository comboRepository;
 
 
-
     //Configuracion Necesaria
     public DetalleVentaServiceImpl(BaseRepository<DetalleVenta, Long> baseRepository, DetalleVentaRepository detalleVentaRepository) {
         super(baseRepository);
@@ -43,40 +42,38 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
     }
 
 
-
-
     public DetalleVenta guardarDetalleVenta(DetalleVenta detalleVenta) {
         return detalleVentaRepository.save(detalleVenta);
     }
+
     public DetalleCombo guardarDetalleCombo(DetalleCombo detalleVenta) {
         return detalleComboRepository.save(detalleVenta);
     }
 
 
-    public List<DetalleVenta>listaDetalle(Long idVenta){
-        Venta venta= ventaRepository.findById(idVenta).orElse(null);
-        if(venta!=null){
-            List<DetalleVenta>detallesObtenidos=venta.getDetalles();
+    public List<DetalleVenta> listaDetalle(Long idVenta) {
+        Venta venta = ventaRepository.findById(idVenta).orElse(null);
+        if (venta != null) {
+            List<DetalleVenta> detallesObtenidos = venta.getDetalles();
             return detallesObtenidos;
 
-        }else {
+        } else {
             System.out.println("Ventano encontrado");
             return Collections.emptyList();
         }
     }
 
-    public List<DetalleCombo>listaDetalleCombo(Long idVenta){
-        Venta venta= ventaRepository.findById(idVenta).orElse(null);
-        if(venta!=null){
-            List<DetalleCombo>detallesObtenidos=venta.getDetalleCombos();
+    public List<DetalleCombo> listaDetalleCombo(Long idVenta) {
+        Venta venta = ventaRepository.findById(idVenta).orElse(null);
+        if (venta != null) {
+            List<DetalleCombo> detallesObtenidos = venta.getDetalleCombos();
             return detallesObtenidos;
 
-        }else {
+        } else {
             System.out.println("Ventano encontrado");
             return Collections.emptyList();
         }
     }
-
 
 
     public DetalleVenta buscarDetalleEnVenta(Long idVenta, Long idDetalle) throws Exception {
@@ -86,9 +83,8 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
         List<DetalleVenta> detalles = venta.getDetalles();
 
 
-
         for (DetalleVenta detalle : detalles) {
-            if (detalle.getId()==idDetalle) {
+            if (detalle.getId() == idDetalle) {
                 return detalle;
             }
         }
@@ -97,19 +93,21 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
     }
     //si se elimina un detalle se debe reincorporar el stock lo mismo con venta ,
 
-    public DetalleCombo buscarDetalleComboEnVenta(Long idVenta ,Long idDetalle) throws Exception {
+    public DetalleCombo buscarDetalleComboEnVenta(Long idVenta, Long idDetalle) throws Exception {
         Venta venta = ventaRepository.findById(idVenta)
                 .orElseThrow(() -> new Exception("id no encontrado"));
 
         List<DetalleCombo> detalles = venta.getDetalleCombos();
         for (DetalleCombo detalle : detalles) {
-            if (detalle.getId()==idDetalle) {
+            if (detalle.getId() == idDetalle) {
                 return detalle;
             }
         }
 
         throw new Exception("Detalle no encontrado en la venta con ID: " + idDetalle);
     }
+
+
 
 
 
@@ -124,7 +122,7 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
         while (iterator.hasNext()) {
             DetalleCombo detalleCombo = iterator.next();
 
-            if (detalleCombo.getId()==(idDetalle)) {
+            if (detalleCombo.getId() == (idDetalle)) {
                 Combo combo = detalleCombo.getCombo();
 
                 if (combo != null) {
@@ -134,10 +132,10 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
                     // Iterar sobre los productos del combo
                     for (int i = 0; i < productosDelCombo.size(); i++) {
                         Producto producto = productosDelCombo.get(i);
-                        Integer cantidad = cantidades.get(i)*detalleCombo.getCantidad();
+                        Integer cantidad = cantidades.get(i) * detalleCombo.getCantidad();
 
                         // Aumentar el stock de cada producto según la cantidad en el combo
-                       productoService.aumentarStock(producto.getId(), cantidad);
+                        productoService.aumentarStock(producto.getId(), cantidad);
                     }
                 }
 
@@ -147,7 +145,9 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
 
                 // Actualizar las listas en la entidad Venta después de la eliminación
                 venta.setDetalleCombos(detalleCombos);
+                actualizarMontoVentaCombo(venta);
                 ventaRepository.save(venta);
+
 
                 return; // Terminar el método después de encontrar y procesar el detalleCombo
             }
@@ -157,9 +157,7 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
     }
 
 
-    public void eliminarDetalle( Long idVenta, Long idDetalle) throws Exception {
-
-
+    public void eliminarDetalle(Long idVenta, Long idDetalle) throws Exception {
 
 
         Venta venta = ventaRepository.findById(idVenta)
@@ -170,14 +168,17 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
         Iterator<DetalleVenta> iterator = detalles.iterator();
         while (iterator.hasNext()) {
             DetalleVenta detalle = iterator.next();
-            if (detalle.getId()==(idDetalle)) {
+            if (detalle.getId() == (idDetalle)) {
                 Producto producto = detalle.getProducto();
 
                 if (producto != null) {
                     producto.setStock(producto.getStock() + detalle.getCantidad());
+                    venta.setMontoVenta(venta.getMontoVenta() - detalle.getSubTotal());
                 }
                 iterator.remove(); // Eliminar el detalle de la lista
                 detalleVentaRepository.deleteById(idDetalle); // Eliminar el detalle de la base de datos
+               actualizarMontoVenta(venta);
+                ventaRepository.save(venta);
                 return;
             }
         }
@@ -185,6 +186,18 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
         throw new Exception("Detalle no encontrado en la venta con ID: " + idVenta);
     }
 
+    private void actualizarMontoVenta(Venta venta) {
+        // Calcular el nuevo montoVenta sumando los subTotal actualizados de todos los detalles
+        double nuevoMontoVenta = venta.getDetalles().stream()
+                .mapToDouble(detalle -> detalle.getSubTotal())
+                .sum();
+
+        // Actualizar el montoVenta de la venta
+        venta.setMontoVenta(nuevoMontoVenta);
+
+        // Guardar cambios en la venta
+        ventaRepository.save(venta);
+    }
     public void actualizarDetalleVenta(Long idVenta, Long idDetalle, DetalleVenta detalleActualizado) throws Exception {
         Venta venta = ventaRepository.findById(idVenta)
                 .orElseThrow(() -> new Exception("Venta no encontrada con ID: " + idVenta));
@@ -193,42 +206,55 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
 
         for (DetalleVenta detalle : detalles) {
             if (detalle.getId() == idDetalle) {
-                Long idProductoAntiguo = detalle.getProducto().getId();
-                Producto productoAntiguo = productoRepository.findById(idProductoAntiguo)
-                        .orElseThrow(() -> new Exception("Producto no encontrado con ID " + idProductoAntiguo));
+                Producto productoAntiguo = detalle.getProducto();
 
-                // Obtener el nuevo producto asociado al detalle
-                Long idProductoNuevo = detalleActualizado.getProducto().getId();
-                Producto productoNuevo = productoRepository.findById(idProductoNuevo)
-                        .orElseThrow(() -> new Exception("Producto no encontrado con ID " + idProductoNuevo));
+                // Verificar si se proporcionó un nuevo producto
+                if (detalleActualizado.getProducto() != null) {
+                    // Obtener el nuevo producto asociado al detalle por nombre
+                    String nombreProductoNuevo = detalleActualizado.getProducto().getNombreProducto();
+                    Producto productoNuevo = productoRepository.findByNombreProducto(nombreProductoNuevo)
+                            .orElseThrow(() -> new Exception("Producto no encontrado con nombre " + nombreProductoNuevo));
 
-                // Actualizar el producto asociado al detalle
-                detalle.setProducto(productoNuevo);
+                    // Actualizar el producto asociado al detalle
+                    detalle.setProducto(productoNuevo);
 
-                int cantidadAnterior = detalle.getCantidad();
-                int cantidadNueva = detalleActualizado.getCantidad();
-                detalle.setCantidad(cantidadNueva);
+                    // Reponer el stock del producto antiguo
+                    int cantidadAnterior = detalle.getCantidad();
+                    int nuevoStockAntiguo = productoAntiguo.getStock() + cantidadAnterior;
+                    productoAntiguo.setStock(nuevoStockAntiguo);
+                    productoRepository.save(productoAntiguo);
 
+                    // Actualizar la cantidad y el subtotal
+                    int cantidadNueva = detalleActualizado.getCantidad();
+                    detalle.setCantidad(cantidadNueva);
+                    detalle.setSubTotal(productoNuevo.getPrecio() * cantidadNueva);
 
-                detalle.setSubTotal(productoNuevo.getPrecio()*cantidadNueva);
-                detalleVentaRepository.save(detalle);
+                    // Ajustar el stock del nuevo producto
+                    int nuevoStockNuevo = productoNuevo.getStock() - cantidadNueva;
+                    if (nuevoStockNuevo < 0) {
+                        // Puedes lanzar una excepción o manejarlo de alguna otra manera
+                        throw new IllegalStateException("La cantidad actualizada excede el stock disponible para el nuevo producto con nombre " + nombreProductoNuevo);
+                    }
+                    productoNuevo.setStock(nuevoStockNuevo);
+                    productoRepository.save(productoNuevo);
+                } else {
+                    // Solo se está actualizando la cantidad, no se proporcionó un nuevo producto
+                    int cantidadNueva = detalleActualizado.getCantidad();
+                    int cantidadAnterior = detalle.getCantidad();
 
+                    // Actualizar la cantidad y el subtotal
+                    detalle.setCantidad(cantidadNueva);
+                    detalle.setSubTotal(productoAntiguo.getPrecio() * cantidadNueva);
 
-
-                // Reponer el stock del producto antiguo
-                int nuevoStockAntiguo = productoAntiguo.getStock() + cantidadAnterior;
-                productoAntiguo.setStock(nuevoStockAntiguo);
-                productoRepository.save(productoAntiguo);
-
-                // Actualizar el stock del nuevo producto
-                int nuevoStockNuevo = productoNuevo.getStock() - cantidadNueva;
-                if (nuevoStockNuevo < 0) {
-                    // Puedes lanzar una excepción o manejarlo de alguna otra manera
-                    throw new IllegalStateException("La cantidad actualizada excede el stock disponible para el nuevo producto con ID " + idProductoNuevo);
+                    // Ajustar el stock del producto antiguo
+                    int ajusteStock = cantidadAnterior - cantidadNueva;
+                    int nuevoStockAntiguo = productoAntiguo.getStock() + ajusteStock;
+                    productoAntiguo.setStock(nuevoStockAntiguo);
+                    productoRepository.save(productoAntiguo);
                 }
-                productoNuevo.setStock(nuevoStockNuevo);
-                productoRepository.save(productoNuevo);
 
+                detalleVentaRepository.save(detalle);
+                actualizarMontoVenta(venta);
                 return;
             }
         }
@@ -237,12 +263,25 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
     }
 
 
+    private void actualizarMontoVentaCombo(Venta venta) {
+        // Calcular el nuevo montoVenta sumando los subTotal actualizados de todos los detalles y detalleCombos
+        double nuevoMontoVenta = venta.getDetalles().stream()
+                .mapToDouble(detalle -> detalle.getSubTotal())
+                .sum();
+
+        nuevoMontoVenta += venta.getDetalleCombos().stream()
+                .mapToDouble(detalleCombo -> detalleCombo.getSubTotal())
+                .sum();
+
+        // Actualizar el montoVenta de la venta
+        venta.setMontoVenta(nuevoMontoVenta);
+
+        // Guardar cambios en la venta
+        ventaRepository.save(venta);
+    }
 
 
     public void actualizarDetalleCombo(Long idVenta , Long idDetalle ,DetalleCombo detalleComboActualizado) throws Exception {
-
-
-
 
         Venta venta = ventaRepository.findById(idVenta)
                 .orElseThrow(() -> new Exception("Venta no encontrada con ID: " + idVenta));
@@ -253,11 +292,11 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
         for(DetalleCombo detalleCombo : detalleCombos){
             if(detalleCombo.getId()==idDetalle){
 
-                Long idComboAntiguo=detalleCombo.getCombo().getId();
+              Long idComboAntiguo=detalleCombo.getCombo().getId();
                 Combo comboAntiguo=comboRepository.findById(idComboAntiguo).orElseThrow(()->new Exception("combo no encontrado" +idComboAntiguo));
 
-                Long idComboNuevo=detalleCombo.getCombo().getId();
-                Combo comboNuevo=comboRepository.findById(idComboNuevo).orElseThrow(()->new Exception("combo no encontrado" +idComboNuevo));
+                String idComboNuevo=detalleCombo.getCombo().getNombreCombo();
+                Combo comboNuevo=comboRepository.findByNombreCombo(idComboNuevo).orElseThrow(()->new Exception("combo no encontrado" +idComboNuevo));
 
                 detalleCombo.setCombo(comboNuevo);
 
@@ -287,6 +326,8 @@ public class DetalleVentaServiceImpl extends BaseServiceImpl<DetalleVenta,Long> 
                     productoRepository.save(productoNuevo);
 
                 }
+                actualizarMontoVentaCombo(venta);
+                ventaRepository.save(venta);
                 return;
 
             }

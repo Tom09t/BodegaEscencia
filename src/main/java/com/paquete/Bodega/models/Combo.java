@@ -1,5 +1,6 @@
 package com.paquete.Bodega.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -23,7 +24,10 @@ public class Combo extends BaseEntidad{
 
     @NotNull
     private Double precioTotal;
+
+
     @JsonManagedReference
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "producto_combo",
@@ -31,7 +35,16 @@ public class Combo extends BaseEntidad{
             inverseJoinColumns = @JoinColumn(name = "producto_id"))
     private List<Producto> productos = new ArrayList<>();
 
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "combo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleCombo> detalles = new ArrayList<>();
+
     private List<Integer> cantidadesXproductos =new ArrayList<>();
+
+
+
+
 
 
 

@@ -20,20 +20,26 @@ import java.util.List;
 @Table(name = "Grupo")
 public class Grupo extends BaseEntidad{
 
-    @NotNull
-    private double montoGrupo;
+
+    private double montoVentasGrupo;
     @NotNull
     private int comensales;
-    @NotNull
+   // @NotNull
     private EstadoGrupo estadoGrupo;
 
-    @NotNull
+    private Double descuentoCtaCorriente;
+
+    private Double descuentoComision;
+    private Double total;
+
+
+   // @NotNull
     private Double montoMesa;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "empresa_id", referencedColumnName = "id")
     private Empresa empresa;
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Venta> ventas = new ArrayList<>();
 

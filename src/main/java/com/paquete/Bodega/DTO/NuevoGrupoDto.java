@@ -15,6 +15,6 @@ public class NuevoGrupoDto {
     private Integer comensales;
     private Long empresa;
     private EstadoGrupo estadoGrupo;
-    private Double totalMesa;
+    private Double montoMesa;
 
 }
