@@ -25,10 +25,10 @@ public class GrupoController extends BaseControllerImpl<Grupo, GrupoServiceImpl>
 @Autowired
 private GrupoServiceImpl grupoService;
 
-    @PostMapping("/CrearNuevoGrupoRestaurante")
+    @PostMapping("/CrearNuevoGrupo")
     public ResponseEntity<?> crearNuevoGrupoRestaurante(@RequestBody NuevoGrupoDto nuevoGrupoDto){
         try{
-            grupoService.crearGrupoRestaurante(nuevoGrupoDto);
+            grupoService.crearGrup(nuevoGrupoDto);
             return ResponseEntity.ok("Grupo creado exitosamente");
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -36,7 +36,7 @@ private GrupoServiceImpl grupoService;
         }
     }
 
-    @PostMapping("/CrearNuevoGrupoWine")
+  /*  @PostMapping("/CrearNuevoGrupoWine")
     public ResponseEntity<?> crearNuevoGrupoWine(@RequestBody NuevoGrupoDto nuevoGrupoDto){
         try{
             grupoService.crearGrupoWine(nuevoGrupoDto);
@@ -45,7 +45,7 @@ private GrupoServiceImpl grupoService;
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al crear el grupo: " + e.getMessage());
         }
-    }
+    }*/
 
     @GetMapping("/listR")
     public ResponseEntity<List<Grupo>> obtenerGruposConTotales() {

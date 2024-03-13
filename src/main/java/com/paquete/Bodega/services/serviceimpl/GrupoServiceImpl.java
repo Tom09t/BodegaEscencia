@@ -172,7 +172,7 @@ public class GrupoServiceImpl extends BaseServiceImpl<Grupo, Long> implements Gr
 
 
 
-    public void crearGrupoRestaurante(NuevoGrupoDto nuevoGrupoDto) {
+    public void crearGrup(NuevoGrupoDto nuevoGrupoDto) {
         // Buscar la empresa por su id
         Optional<Empresa> optionalEmpresa = empresaRepository.findById(nuevoGrupoDto.getEmpresa());
 
@@ -188,7 +188,7 @@ public class GrupoServiceImpl extends BaseServiceImpl<Grupo, Long> implements Gr
                     .estadoGrupo(EstadoGrupo.ABIERTO)
                     .montoVentasGrupo(0)
                     .montoMesa(0.0)
-                    .tipoGrupo(TipoGrupo.Restaurante)
+                   // .tipoGrupo(TipoGrupo.Restaurante)
                     // Agrega otros atributos del grupo según tus necesidades
                     .build();
             grupoRepository.save(nuevoGrupo);
@@ -218,7 +218,7 @@ public class GrupoServiceImpl extends BaseServiceImpl<Grupo, Long> implements Gr
                     .empresa(empresa)
                     .estadoGrupo(EstadoGrupo.ABIERTO)
                     .montoVentasGrupo(0)
-                    .tipoGrupo(TipoGrupo.Wine)
+                    //.tipoGrupo(TipoGrupo.Wine)
                     // Agrega otros atributos del grupo según tus necesidades
                     .build();
 
