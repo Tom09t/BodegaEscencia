@@ -2,6 +2,8 @@ package com.paquete.Bodega.services.serviceimpl;
 
 import com.paquete.Bodega.DTO.NuevoGrupoDto;
 import com.paquete.Bodega.Enum.EstadoGrupo;
+import com.paquete.Bodega.Enum.FormaPago;
+import com.paquete.Bodega.Enum.TipoGrupo;
 import com.paquete.Bodega.Enum.TipoVenta;
 import com.paquete.Bodega.models.EmpleadoEmpresa;
 import com.paquete.Bodega.models.Empresa;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,7 +42,7 @@ public class GrupoServiceImpl extends BaseServiceImpl<Grupo, Long> implements Gr
 
 
     public List<Grupo> listarGruposRestaurante() {
-        List<Grupo> grupos = grupoRepository.findByTipoVentaRestaurante();
+        List<Grupo> grupos = grupoRepository.findAll();
 
         return grupos.stream()
                 .map(grupo -> {
@@ -51,33 +54,33 @@ public class GrupoServiceImpl extends BaseServiceImpl<Grupo, Long> implements Gr
                             .mapToDouble(Venta::getMontoVenta)
                             .sum();
                     if(totalVentas<0){
-                       totalVentas=0;
+                        totalVentas=0;
                     }
-
 
                     grupo.setMontoVentasGrupo(totalVentas);
 
-                    Double totalProvisional = totalVentas + grupo.getMontoMesa();
+                    if (!ventasRestaurante.isEmpty()) { // Aplicar operaciones solo si hay ventas
+                        Double totalProvisional = totalVentas + grupo.getMontoMesa();
 
-                    double descuentoCuentaCorriente = calcularCuentaCorriente(totalProvisional, grupo.getEmpresa().getId());
+                        double descuentoCuentaCorriente = calcularCuentaCorriente(totalProvisional, grupo.getEmpresa().getId());
 
+                        if(descuentoCuentaCorriente<0){
+                            descuentoCuentaCorriente = 0.0;
+                        }
+                        grupo.setDescuentoCtaCorriente(descuentoCuentaCorriente);
+                        double descuentoComsion = calcularComision(grupo.getEmpresa().getId(), totalProvisional);
+                        if(descuentoComsion<0){
+                            descuentoComsion=0.0;
+                        }
 
-                    if(descuentoCuentaCorriente<0){
-                        descuentoCuentaCorriente = 0.0;
+                        grupo.setDescuentoComision(descuentoComsion);
+
+                        Double total = totalProvisional - descuentoCuentaCorriente - descuentoComsion;
+                        if(total<0){
+                            total=0.0;
+                        }
+                        grupo.setTotal(total);
                     }
-                    grupo.setDescuentoCtaCorriente(descuentoCuentaCorriente);
-                    double descuentoComsion = calcularComision(grupo.getEmpresa().getId(), totalProvisional);
-                if(descuentoComsion<0){
-                  descuentoComsion=0.0;
-                }
-
-                    grupo.setDescuentoComision(descuentoComsion);
-
-                    Double total = totalProvisional - descuentoCuentaCorriente - descuentoComsion;
-                   if(total<0){
-                     total=0.0;
-                   }
-                    grupo.setTotal(total);
 
                     return grupo;
                 })
@@ -168,29 +171,59 @@ public class GrupoServiceImpl extends BaseServiceImpl<Grupo, Long> implements Gr
     }
 
 
-    public Grupo crearGrupo(NuevoGrupoDto nuevoGrupoDto) {
+
+    public void crearGrupoRestaurante(NuevoGrupoDto nuevoGrupoDto) {
         // Buscar la empresa por su id
-        Empresa empresa= empresaRepository.findById(nuevoGrupoDto.getEmpresa()).orElse(null);
+        Optional<Empresa> optionalEmpresa = empresaRepository.findById(nuevoGrupoDto.getEmpresa());
 
         // Verificar si la empresa existe antes de proceder
-        if (empresa!=null) {
+        if (optionalEmpresa.isPresent()) {
             // Obtener la empresa desde el Optional
-
+            Empresa empresa = optionalEmpresa.get();
 
             // CrearGrupoConBuilder
-            Grupo nuevoGrupo = new Grupo();
-            nuevoGrupo.setEstadoGrupo(EstadoGrupo.ABIERTO);
-            nuevoGrupo.setEmpresa(empresa);
-            nuevoGrupo.setMontoMesa(0.0);
-            nuevoGrupo.setComensales(nuevoGrupoDto.getComensales());
-            
+            Grupo nuevoGrupo = Grupo.builder()
+                    .comensales(nuevoGrupoDto.getComensales())
+                    .empresa(empresa)
+                    .estadoGrupo(EstadoGrupo.ABIERTO)
+                    .montoVentasGrupo(0)
+                    .montoMesa(0.0)
+                    .tipoGrupo(TipoGrupo.Restaurante)
+                    // Agrega otros atributos del grupo según tus necesidades
+                    .build();
+            grupoRepository.save(nuevoGrupo);
 
 
-            // Guardar el grupo en la base de datos
-           return grupoRepository.save(nuevoGrupo);
+
+
         } else {
             // Manejar el caso en que la empresa no existe (lanzar excepción, devolver un mensaje de error, etc.)
             throw new Error("No se encontró la empresa con el ID proporcionado");
+        }
+    }
+
+    public void crearGrupoWine(NuevoGrupoDto nuevoGrupoDto) {
+        // Buscar la empresa por su id
+        Optional<Empresa> optionalEmpresa = empresaRepository.findById(nuevoGrupoDto.getEmpresa());
+
+        // Verificar si la empresa existe antes de proceder
+        if (optionalEmpresa.isPresent()) {
+
+        } else{
+            // Obtener la empresa desde el Optional
+            Empresa empresa = optionalEmpresa.get();
+
+            // CrearGrupoConBuilder
+            Grupo nuevoGrupo = Grupo.builder()
+                    .empresa(empresa)
+                    .estadoGrupo(EstadoGrupo.ABIERTO)
+                    .montoVentasGrupo(0)
+                    .tipoGrupo(TipoGrupo.Wine)
+                    // Agrega otros atributos del grupo según tus necesidades
+                    .build();
+
+            // Guardar el grupo en la base de datos
+            grupoRepository.save(nuevoGrupo);
         }
 
     }

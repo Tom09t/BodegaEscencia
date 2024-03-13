@@ -2,6 +2,7 @@ package com.paquete.Bodega.services.serviceimpl;
 
 import com.paquete.Bodega.DTO.DetalleVentaDto;
 import com.paquete.Bodega.DTO.VentaDto;
+import com.paquete.Bodega.Enum.TipoGrupo;
 import com.paquete.Bodega.Enum.TipoVenta;
 import com.paquete.Bodega.models.*;
 import com.paquete.Bodega.repository.*;
@@ -56,7 +57,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
 
 
     @Transactional(rollbackOn = RuntimeException.class)
-    public Venta crearVentaConDetallesRestaurante(VentaDto ventaDTO) throws Exception {
+    public Venta crearVentaConDetallesWine(VentaDto ventaDTO) throws Exception {
 
         try {
             Long grupoId = ventaDTO.getGrupoId();
@@ -66,7 +67,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
 
 
             Venta nuevaVenta = new Venta();
-            nuevaVenta.setTipoVenta(TipoVenta.RESTAURANTE);
+            nuevaVenta.setTipoVenta(TipoVenta.WINE);
             nuevaVenta.setFormaPago(ventaDTO.getFormaPago());
             nuevaVenta.setGrupo(grupoExistente);
             nuevaVenta.setFechaVenta(LocalDateTime.now());
@@ -149,16 +150,16 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
 
 
     @Transactional(rollbackOn = RuntimeException.class)
-    public Venta crearVentaConDetallesWine(VentaDto ventaDTO) throws Exception {
+    public Venta crearVentaConDetallesRestaurante(VentaDto ventaDTO) throws Exception {
 
         try {
             Long grupoId = ventaDTO.getGrupoId();
             Grupo grupoExistente = grupoRepository.findById(grupoId)
                     .orElseThrow(() -> new Exception("No se encontró el grupo con ID: " + grupoId));
 
-
+if(grupoExistente.getTipoGrupo()==TipoGrupo.Restaurante){
             Venta nuevaVenta = new Venta();
-            nuevaVenta.setTipoVenta(TipoVenta.WINE);
+            nuevaVenta.setTipoVenta(TipoVenta.RESTAURANTE);
             nuevaVenta.setFormaPago(ventaDTO.getFormaPago());
             nuevaVenta.setGrupo(grupoExistente);
             nuevaVenta.setFechaVenta(LocalDateTime.now());
@@ -209,12 +210,9 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
             ventaGuardada.setEsCombo(esCombo);
 
             if (esCombo) {
-                // Si esCombo es true, entonces hay al menos un combo en la venta
-                Long comboId = comboIds.get(0);  // Tomamos el primer combo encontrado
-                Combo combo = comboRepository.findById(comboId).orElse(null);
 
-                // Ahora, puedes hacer algo con el combo encontrado si es necesario
-                // Por ejemplo, mostrar información o realizar alguna acción específica
+                Long comboId = comboIds.get(0);
+                Combo combo = comboRepository.findById(comboId).orElse(null);
             }
 
 
@@ -233,6 +231,87 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
             ventaRepository.save(ventaGuardada);
 
             return ventaGuardada;
+        }else {
+    Venta nuevaVenta = new Venta();
+    nuevaVenta.setTipoVenta(TipoVenta.RESTAURANTE);
+    nuevaVenta.setFormaPago(ventaDTO.getFormaPago());
+    nuevaVenta.setGrupo(grupoExistente);
+    nuevaVenta.setFechaVenta(LocalDateTime.now());
+
+    Venta ventaGuardada = ventaRepository.save(nuevaVenta);
+
+    List<DetalleVenta> detallesVenta = new ArrayList<>();
+    List<DetalleCombo> detallesCombo = new ArrayList<>();
+
+    for (DetalleVentaDto detalleDTO : ventaDTO.getDetalles()) {
+        if ("producto".equals(detalleDTO.getTipo())) {
+            DetalleVenta detalleVenta = new DetalleVenta();
+            detalleVenta.setCantidad(detalleDTO.getCantidad());
+
+            Producto producto = productoRepository.findById(detalleDTO.getProductoId()).orElse(null);
+            if (producto != null) {
+                Double subtotal = detalleDTO.getCantidad() * producto.getPrecio();
+
+                detalleVenta.setSubTotal(subtotal);
+                detalleVenta.setProducto(producto);
+                if (!productoService.actualizarStock(detalleDTO.getProductoId(), detalleDTO.getCantidad())) {
+                    throw new IllegalStateException("Stock insuficiente del producto con id " + producto.getId());
+                }
+                detalleVenta.setVenta(ventaGuardada);
+                detallesVenta.add(detalleVenta);
+            }
+        } else if ("combo".equals(detalleDTO.getTipo())) {
+            DetalleCombo detalleCombo = new DetalleCombo();
+
+            detalleCombo.setCantidad(detalleDTO.getCantidad());
+
+            Combo combo = comboRepository.findById(detalleDTO.getComboId()).orElse(null);
+            if (combo != null) {
+                detalleCombo.setSubTotal(detalleDTO.getCantidad() * combo.getPrecioTotal());
+                detalleCombo.setCombo(combo);
+                if (!stockCombo(combo.getId(), detalleDTO.getCantidad())) {
+                    throw new IllegalStateException("Stock insuficiente para el combo");
+                }
+                detalleCombo.setVenta(ventaGuardada);
+                detalleService.guardarDetalleCombo(detalleCombo);
+                detallesCombo.add(detalleCombo);
+            }
+
+        }
+    }
+    List<Long> comboIds = comboService.obtenerCombosEnVenta(ventaDTO.getDetalles());
+    boolean esCombo = !comboIds.isEmpty();
+    ventaGuardada.setEsCombo(esCombo);
+
+    if (esCombo) {
+        // Si esCombo es true, entonces hay al menos un combo en la venta
+        Long comboId = comboIds.get(0);  // Tomamos el primer combo encontrado
+        Combo combo = comboRepository.findById(comboId).orElse(null);
+
+        // Ahora, puedes hacer algo con el combo encontrado si es necesario
+        // Por ejemplo, mostrar información o realizar alguna acción específica
+    }
+
+
+    ventaGuardada.setDetalles(detallesVenta);
+    ventaGuardada.setDetalleCombos(detallesCombo);
+
+    double montoVenta = detallesVenta.stream()
+            .mapToDouble(detalle -> detalle.getCantidad() * detalle.getProducto().getPrecio())
+            .sum();
+
+    double montoVentaCombo = detallesCombo.stream()
+            .mapToDouble(detalle -> detalle.getCantidad() * detalle.getCombo().getPrecioTotal())
+            .sum();
+    double resultadoFinal = montoVenta + montoVentaCombo;
+    ventaGuardada.setMontoVenta(resultadoFinal);
+    ventaRepository.save(ventaGuardada);
+
+    return ventaGuardada;
+
+
+}
+
         } catch (RuntimeException e) {
             throw new IllegalStateException("Error al crear la venta", e);
         }
