@@ -2,6 +2,7 @@ package com.paquete.Bodega.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.paquete.Bodega.Enum.EstadoGrupo;
+import com.paquete.Bodega.Enum.TipoGrupo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,8 @@ public class Grupo extends BaseEntidad{
     private int comensales;
     @NotNull
     private EstadoGrupo estadoGrupo;
+    @NotNull
+    private TipoGrupo tipoGrupo;
 
     @NotNull
     private Double montoMesa;
