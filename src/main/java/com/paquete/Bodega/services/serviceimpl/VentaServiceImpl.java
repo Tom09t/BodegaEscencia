@@ -363,7 +363,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
         ventaRepository.deleteById(idVenta);
     }
 
-    public void agregarDetalleCombo(Long idVenta, DetalleVentaDto nuevoDetalleCombo) throws Exception {
+ /*   public void agregarDetalleCombo(Long idVenta, DetalleVentaDto nuevoDetalleCombo) throws Exception {
         Venta venta = ventaRepository.findById(idVenta)
                 .orElseThrow(() -> new Exception("Venta no encontrada con ID: " + idVenta));
 
@@ -378,7 +378,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
             if (!stockCombo(combo.getId(), nuevoDetalleCombo.getCantidad())) {
                 throw new IllegalStateException("Stock insuficiente para el combo");
             }
-        }
+
 
 
       List<DetalleCombo>detalleCombos=venta.getDetalleCombos();
@@ -389,7 +389,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
 
         // Actualizar la venta en la base de datos
         ventaRepository.save(venta);
-    }
+    }  }*/
 
 
 
