@@ -36,7 +36,8 @@ public class Combo extends BaseEntidad{
     private List<Producto> productos = new ArrayList<>();
 
 
-    @JsonIgnore
+
+
     @OneToMany(mappedBy = "combo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleCombo> detalles = new ArrayList<>();
 
