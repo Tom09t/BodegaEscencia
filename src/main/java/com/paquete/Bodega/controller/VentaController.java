@@ -1,8 +1,7 @@
 package com.paquete.Bodega.controller;
 
-import com.paquete.Bodega.DTO.VentaComboDto;
 import com.paquete.Bodega.DTO.VentaDto;
-import com.paquete.Bodega.models.DetalleVenta;
+import com.paquete.Bodega.models.DetalleCombo;
 import com.paquete.Bodega.models.Venta;
 import com.paquete.Bodega.services.serviceimpl.VentaServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,22 +19,43 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
     @Autowired
     private VentaServiceImpl  ventaService;
 
-    @PostMapping("/guardar")
+    @PostMapping("/guardarR")
     public ResponseEntity<Venta> crearVentaConDetalles(@RequestBody VentaDto ventaDto) {
         try {
-            Venta venta = ventaService.crearVentaConDetalles(ventaDto);
+            Venta venta = ventaService.crearVentaConDetallesRestaurante(ventaDto);
+            return ResponseEntity.ok().body(venta);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+    @PostMapping("/guardarW")
+    public ResponseEntity<Venta> crearVentaConDetallesW(@RequestBody VentaDto ventaDto) {
+        try {
+            Venta venta = ventaService.crearVentaConDetallesWine(ventaDto);
             return ResponseEntity.ok().body(venta);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
+    /*@PutMapping("/agregarDetalleC/{id}")
+    public ResponseEntity<?>agregarDetalleCombo(@RequestBody DetalleCombo detalleCombo ,@PathVariable Long id) throws Exception {
+      ventaService.agregarDetalleCombo(id,detalleCombo);
+        return ResponseEntity.status(HttpStatus.OK).body("DETALLE AGREGADO");
+    }*/
 
-    @GetMapping("/grupo/{id}")
-    public ResponseEntity<List<Venta>> obtenerVentasDeGrupo(@PathVariable Long id) {
+    @GetMapping("/grupoR/{id}")
+    public ResponseEntity<List<Venta>> obtenerVentasDeGrupoRestaurante(@PathVariable Long id) {
         List<Venta> ventas = ventaService.listarVentaDeGrupo(id);
         return ResponseEntity.ok(ventas);
     }
+
+    @GetMapping("/grupoW/{id}")
+    public ResponseEntity<List<Venta>> obtenerVentasDeGrupoWine(@PathVariable Long id) {
+        List<Venta> ventas = ventaService.listarVentaDeGrupoWine(id);
+        return ResponseEntity.ok(ventas);
+    }
+
 
     @GetMapping("/fechas")
     public ResponseEntity<List<Venta>> ventasHistorial() {

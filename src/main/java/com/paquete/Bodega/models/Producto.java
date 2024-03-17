@@ -20,6 +20,7 @@ public class Producto extends BaseEntidad{
 
     private Date fechaBajaProducto;
     @Column(name = "nombre")
+
     @NotNull
     private String nombreProducto;
     @NotNull
@@ -42,9 +43,9 @@ public class Producto extends BaseEntidad{
     private List<DetalleRegalo> detallesRegalo;
 
 
-   @JsonBackReference
+  @JsonBackReference
    @JsonIgnore
-    @ManyToMany(mappedBy = "productos")
+  @ManyToMany(mappedBy = "productos")
     private List<Combo> combos = new ArrayList<>();
 
 

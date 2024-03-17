@@ -22,8 +22,6 @@ public class VentaDto {
 
 
 
-    @Enumerated(EnumType.STRING)
-    @NotNull
-    private TipoVenta tipoVenta;
+
     private List<DetalleVentaDto> detalles;
 }

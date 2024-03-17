@@ -1,13 +1,16 @@
 package com.paquete.Bodega.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -21,12 +24,14 @@ public class DetalleCombo extends BaseEntidad{
 
     @ManyToOne
     @JoinColumn(name = "combo_id")
-    @NotNull
+
     private Combo combo;
+
     private Double subTotal;
 
     @NotNull
     private int cantidad;
+
 
 
 }

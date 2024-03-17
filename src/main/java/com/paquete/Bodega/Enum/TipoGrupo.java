@@ -4,5 +4,4 @@ public enum TipoGrupo {
 
     Restaurante,
     Wine
-
 }

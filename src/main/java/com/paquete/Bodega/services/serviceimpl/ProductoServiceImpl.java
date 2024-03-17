@@ -8,12 +8,14 @@ import com.paquete.Bodega.repository.ProductoRepository;
 import com.paquete.Bodega.services.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-public class ProductoServiceImpl extends BaseServiceImpl<Producto,Long> implements ProductoService{
+public class
+ProductoServiceImpl extends BaseServiceImpl<Producto,Long> implements ProductoService{
 
     //inyeccion de dependencias
     @Autowired
@@ -100,25 +102,47 @@ public class ProductoServiceImpl extends BaseServiceImpl<Producto,Long> implemen
     }
 
 
-    public Producto actualizarProducto(Producto productoActualizado) {
+    public Producto actualizarProducto(Producto productoActualizado) throws Exception {
         // Verificar si el producto existe en la base de datos
         Producto productoExistente = productoRepository.findById(productoActualizado.getId()).orElse(null);
 
         if (productoExistente != null) {
+            // Validar que el stock regalo no sea mayor que el stock actualizado
+            if (productoActualizado.getStockRegalo() > productoActualizado.getStock()) {
+                throw new Exception("El stock regalo no puede ser mayor que el stock actualizado");
+            }
+
+            // Calcular la diferencia entre el nuevo stock regalo y el stock regalo actual
+            int diferenciaStockRegalo = productoActualizado.getStockRegalo() - productoExistente.getStockRegalo();
+
             // Actualizar atributos del producto existente con los nuevos valores
             productoExistente.setFechaBajaProducto(productoActualizado.getFechaBajaProducto());
             productoExistente.setNombreProducto(productoActualizado.getNombreProducto());
             productoExistente.setPrecio(productoActualizado.getPrecio());
-            productoExistente.setStock(productoActualizado.getStock());
+            productoExistente.setStock(productoActualizado.getStock() -diferenciaStockRegalo);
             productoExistente.setStockRegalo(productoActualizado.getStockRegalo());
-            // SE TIENE Q AGREGAR LOGICA PARA ACTUALIZAR LA LISTA DE COMBO O REGALOS SI HACE FALTA
+
+
 
 
             return productoRepository.save(productoExistente);
         }
-return null;
+        return null;
     }
 
 
+    public void eliminarProducto(Long id) {
+        Producto producto = productoRepository.findById(id).orElse(null);
+        if (producto != null) {
+            // Eliminar las asociaciones con los combos
+            for (Combo combo : producto.getCombos()) {
+                combo.getProductos().remove(producto);
+            }
+            // Limpiar la lista de combos del producto
+            producto.getCombos().clear();
+            // Guardar los cambios en la base de datos
+            productoRepository.save(producto);
+        }
+    }
 
 }
