@@ -41,11 +41,11 @@ public class ComboServiceImpl extends BaseServiceImpl<Combo,Long> implements Com
      double precio3;
 
         // Verificar la existencia de los productos del combo
-        List<Long> productosIds = comboDTO.getProductosIds();
+        List<String> productosIds = comboDTO.getProductosIds();
         List<Producto> productosCombo = new ArrayList<>();
 
-        for (Long productoId : productosIds) {
-            Producto productoExistente = productoRepository.findById(productoId)
+        for (String productoId : productosIds) {
+            Producto productoExistente = productoRepository.findByNombreProducto(productoId)
                     .orElseThrow(() -> new Exception("Producto con ID " + productoId + " no encontrado."));
             productosCombo.add(productoExistente);
 

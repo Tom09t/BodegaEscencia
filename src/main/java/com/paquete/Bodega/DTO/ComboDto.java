@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class ComboDto {
     private String nombreCombo;
-    private List<Long> productosIds;
+    private List<String> productosIds;
     private Integer cantidad1;
     private Integer cantidad2;
     private Integer cantidad3;

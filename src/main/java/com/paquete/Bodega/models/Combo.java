@@ -27,7 +27,7 @@ public class Combo extends BaseEntidad{
 
 
     @JsonManagedReference
-    @JsonIgnore
+  //  @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "producto_combo",
@@ -39,6 +39,7 @@ public class Combo extends BaseEntidad{
 
 
     @OneToMany(mappedBy = "combo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<DetalleCombo> detalles = new ArrayList<>();
 
     private List<Integer> cantidadesXproductos =new ArrayList<>();
