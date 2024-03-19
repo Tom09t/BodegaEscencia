@@ -185,6 +185,7 @@ public class GrupoServiceImpl extends BaseServiceImpl<Grupo, Long> implements Gr
             Grupo nuevoGrupo = Grupo.builder()
                     .comensales(nuevoGrupoDto.getComensales())
                     .empresa(empresa)
+                    .tipoGrupo(nuevoGrupoDto.getTipoGrupo())
                     .estadoGrupo(EstadoGrupo.ABIERTO)
                     .montoVentasGrupo(0)
                     .montoMesa(0.0)

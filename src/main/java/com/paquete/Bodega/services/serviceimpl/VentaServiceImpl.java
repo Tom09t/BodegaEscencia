@@ -158,11 +158,13 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                     .orElseThrow(() -> new Exception("No se encontró el grupo con ID: " + grupoId));
 
 if(grupoExistente.getTipoGrupo()==TipoGrupo.Restaurante){
+    System.out.println("grupo " + grupoExistente.getTipoGrupo());
             Venta nuevaVenta = new Venta();
             nuevaVenta.setTipoVenta(TipoVenta.RESTAURANTE);
             nuevaVenta.setFormaPago(ventaDTO.getFormaPago());
             nuevaVenta.setGrupo(grupoExistente);
             nuevaVenta.setFechaVenta(LocalDateTime.now());
+
 
             Venta ventaGuardada = ventaRepository.save(nuevaVenta);
 
@@ -226,14 +228,16 @@ if(grupoExistente.getTipoGrupo()==TipoGrupo.Restaurante){
             double montoVentaCombo = detallesCombo.stream()
                     .mapToDouble(detalle -> detalle.getCantidad() * detalle.getCombo().getPrecioTotal())
                     .sum();
+
             double resultadoFinal = montoVenta + montoVentaCombo;
             ventaGuardada.setMontoVenta(resultadoFinal);
             ventaRepository.save(ventaGuardada);
 
             return ventaGuardada;
         }else {
+
     Venta nuevaVenta = new Venta();
-    nuevaVenta.setTipoVenta(TipoVenta.RESTAURANTE);
+    nuevaVenta.setTipoVenta(TipoVenta.WINE);
     nuevaVenta.setFormaPago(ventaDTO.getFormaPago());
     nuevaVenta.setGrupo(grupoExistente);
     nuevaVenta.setFechaVenta(LocalDateTime.now());

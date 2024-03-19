@@ -1,6 +1,7 @@
 package com.paquete.Bodega.DTO;
 
 import com.paquete.Bodega.Enum.EstadoGrupo;
+import com.paquete.Bodega.Enum.TipoGrupo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +17,6 @@ public class NuevoGrupoDto {
     private Long empresa;
     private EstadoGrupo estadoGrupo;
     private Double montoMesa;
+private TipoGrupo tipoGrupo;
 
 }
