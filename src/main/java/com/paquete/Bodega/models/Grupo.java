@@ -46,6 +46,11 @@ public class Grupo extends BaseEntidad{
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Venta> ventas = new ArrayList<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Regalo> regalos = new ArrayList<>();
+
+
       /*  @OneToOne(cascade= CascadeType.ALL, orphanRemoval = true, fetch= FetchType.EAGER)
     @JoinColumn(name = "mesa_id", referencedColumnName = "id", nullable = true)
     @Builder.Default

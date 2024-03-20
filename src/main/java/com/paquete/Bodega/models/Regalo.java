@@ -1,5 +1,6 @@
 package com.paquete.Bodega.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +19,15 @@ public class Regalo extends BaseEntidad{
 
 
     private Date fecha;
+
+
     @OneToMany(mappedBy = "regalo", cascade = CascadeType.ALL, orphanRemoval = true)
    private List<DetalleRegalo>detalleRegalos= new ArrayList<>();
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grupo_id")
+    @JsonIgnore
+    private Grupo grupo;
 
 }

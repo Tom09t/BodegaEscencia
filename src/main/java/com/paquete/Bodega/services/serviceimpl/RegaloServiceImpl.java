@@ -44,10 +44,10 @@ public class RegaloServiceImpl extends BaseServiceImpl<Regalo, Long> implements 
 
 
 
-@Transactional
+
     public Regalo guardarRegalo(RegaloDto regalo) throws Exception {
 
-
+try{
         Long grupoId=regalo.getGrupoId();
         Grupo grupoExistente =grupoRepository.findById(grupoId)
                 .orElseThrow(() -> new Exception("No se encontró el grupo con ID: " + grupoId));
@@ -76,8 +76,15 @@ public class RegaloServiceImpl extends BaseServiceImpl<Regalo, Long> implements 
 
         }
 
+
+
         regaloRepository.save(regaloGuardado);
         return  regaloGuardado;
+
+    }catch (RuntimeException e) {
+    throw new IllegalStateException("Error al crear la Regalo", e);
+}
+
 
     }
 
