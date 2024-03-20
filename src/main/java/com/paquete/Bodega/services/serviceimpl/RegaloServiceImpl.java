@@ -3,13 +3,12 @@ package com.paquete.Bodega.services.serviceimpl;
 import com.paquete.Bodega.DTO.DetalleRegaloDto;
 import com.paquete.Bodega.DTO.RegaloDto;
 import com.paquete.Bodega.models.DetalleRegalo;
+import com.paquete.Bodega.models.Grupo;
 import com.paquete.Bodega.models.Producto;
 import com.paquete.Bodega.models.Regalo;
-import com.paquete.Bodega.repository.BaseRepository;
-import com.paquete.Bodega.repository.DetalleRegaloRepository;
-import com.paquete.Bodega.repository.ProductoRepository;
-import com.paquete.Bodega.repository.RegaloRepository;
+import com.paquete.Bodega.repository.*;
 import com.paquete.Bodega.services.service.RegaloService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +26,9 @@ public class RegaloServiceImpl extends BaseServiceImpl<Regalo, Long> implements 
     private ProductoRepository productoRepository;
 
     @Autowired
+    GrupoRepository grupoRepository;
+
+    @Autowired
     private DetalleRegaloRepository detalleRegaloRepository;
 
     @Autowired
@@ -42,8 +44,14 @@ public class RegaloServiceImpl extends BaseServiceImpl<Regalo, Long> implements 
 
 
 
-
+@Transactional
     public Regalo guardarRegalo(RegaloDto regalo) throws Exception {
+
+
+        Long grupoId=regalo.getGrupoId();
+        Grupo grupoExistente =grupoRepository.findById(grupoId)
+                .orElseThrow(() -> new Exception("No se encontró el grupo con ID: " + grupoId));
+
 
         Regalo nuevoRegalo = new Regalo();
         nuevoRegalo.setFecha(regalo.getFecha());
@@ -61,6 +69,7 @@ public class RegaloServiceImpl extends BaseServiceImpl<Regalo, Long> implements 
             detalleRegalo.setProducto(producto);
             productoService.actualizarStockRegalo( detalleRegaloDto.getProductoId(),detalleRegaloDto.getCantidad());
             detalleRegalo.setRegalo(regaloGuardado);
+            detalles.add(detalleRegalo);
 
 
             detalleRegaloService.guardarDetalleRegalo(detalleRegalo);

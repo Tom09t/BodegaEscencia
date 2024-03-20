@@ -14,4 +14,6 @@ public class RegaloDto {
     private Date fecha;
 
     private List<DetalleRegaloDto> detallesRegalo;
+    private Long  grupoId;
+
 }
