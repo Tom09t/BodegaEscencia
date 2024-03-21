@@ -232,6 +232,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                     .sum();
 
             double resultadoFinal = montoVenta + montoVentaCombo;
+
             ventaGuardada.setMontoVenta(resultadoFinal);
             ventaRepository.save(ventaGuardada);
 

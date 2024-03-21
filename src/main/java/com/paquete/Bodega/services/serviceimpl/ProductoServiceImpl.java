@@ -112,23 +112,21 @@ ProductoServiceImpl extends BaseServiceImpl<Producto,Long> implements ProductoSe
                 throw new Exception("El stock regalo no puede ser mayor que el stock actualizado");
             }
 
-            // Calcular la diferencia entre el nuevo stock regalo y el stock regalo actual
-            int diferenciaStockRegalo = productoActualizado.getStockRegalo() - productoExistente.getStockRegalo();
+            // Calcular el nuevo stock
+            int nuevoStock = productoActualizado.getStock() - productoActualizado.getStockRegalo();
 
             // Actualizar atributos del producto existente con los nuevos valores
             productoExistente.setFechaBajaProducto(productoActualizado.getFechaBajaProducto());
             productoExistente.setNombreProducto(productoActualizado.getNombreProducto());
             productoExistente.setPrecio(productoActualizado.getPrecio());
-            productoExistente.setStock(productoActualizado.getStock() -diferenciaStockRegalo);
+            productoExistente.setStock(nuevoStock);
             productoExistente.setStockRegalo(productoActualizado.getStockRegalo());
-
-
-
 
             return productoRepository.save(productoExistente);
         }
         return null;
     }
+
 
 
     public void eliminarProducto(Long id) {

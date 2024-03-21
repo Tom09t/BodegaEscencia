@@ -44,10 +44,101 @@ public class GrupoServiceImpl extends BaseServiceImpl<Grupo, Long> implements Gr
     public List<Grupo> listarGruposRestaurante() {
         List<Grupo> grupos = grupoRepository.findAll();
 
-        return grupos.stream()
+
+        for (Grupo grupo : grupos) {
+            List<Venta> ventasRestaurante = grupo.getVentas().stream()
+                    .filter(venta -> venta.getTipoVenta().equals(TipoVenta.RESTAURANTE))
+                    .collect(Collectors.toList());
+
+            if (!ventasRestaurante.isEmpty()) { // Si el grupo tiene ventas de vino
+                // Realizar cálculos adicionales
+                double totalVentas = ventasRestaurante.stream()
+                        .mapToDouble(Venta::getMontoVenta)
+                        .sum();
+
+                if (totalVentas < 0) {
+                    totalVentas = 0;
+                }
+
+                grupo.setMontoVentasGrupo(totalVentas);
+
+                Double totalProvisional = totalVentas + grupo.getMontoMesa();
+
+                double descuentoCuentaCorriente = calcularCuentaCorriente(totalProvisional, grupo.getEmpresa().getId());
+                if (descuentoCuentaCorriente < 0) {
+                    descuentoCuentaCorriente = 0.0;
+                }
+                grupo.setDescuentoCtaCorriente(descuentoCuentaCorriente);
+
+                double descuentoComsion = calcularComision(grupo.getEmpresa().getId(), totalProvisional);
+                if (descuentoComsion < 0) {
+                    descuentoComsion = 0.0;
+                }
+                grupo.setDescuentoComision(descuentoComsion);
+
+                Double total = totalProvisional - descuentoCuentaCorriente - descuentoComsion;
+                if (total < 0) {
+                    total = 0.0;
+                }
+                grupo.setTotal(total);
+            }
+
+    }
+        return grupos;
+    }
+        public List<Grupo> listarGruposWine() {
+        List<Grupo> grupos = grupoRepository.findAll();
+
+
+        for (Grupo grupo : grupos) {
+            List<Venta> ventasWine = grupo.getVentas().stream()
+                    .filter(venta -> venta.getTipoVenta().equals(TipoVenta.WINE))
+                    .collect(Collectors.toList());
+
+            if (!ventasWine.isEmpty()) { // Si el grupo tiene ventas de vino
+                // Realizar cálculos adicionales
+                double totalVentas = ventasWine.stream()
+                        .mapToDouble(Venta::getMontoVenta)
+                        .sum();
+
+                if (totalVentas < 0) {
+                    totalVentas = 0;
+                }
+
+                grupo.setMontoVentasGrupo(totalVentas);
+
+                Double totalProvisional = totalVentas + grupo.getMontoMesa();
+
+                double descuentoCuentaCorriente = calcularCuentaCorriente(totalProvisional, grupo.getEmpresa().getId());
+                if (descuentoCuentaCorriente < 0) {
+                    descuentoCuentaCorriente = 0.0;
+                }
+                grupo.setDescuentoCtaCorriente(descuentoCuentaCorriente);
+
+                double descuentoComsion = calcularComision(grupo.getEmpresa().getId(), totalProvisional);
+                if (descuentoComsion < 0) {
+                    descuentoComsion = 0.0;
+                }
+                grupo.setDescuentoComision(descuentoComsion);
+
+                Double total = totalProvisional - descuentoCuentaCorriente - descuentoComsion;
+                if (total < 0) {
+                    total = 0.0;
+                }
+                grupo.setTotal(total);
+            }
+            return grupos;
+        }
+
+
+
+
+
+        List<Grupo> gruposConVentas = grupoRepository.findByTipoVentaWne();
+        return gruposConVentas.stream()
                 .map(grupo -> {
                     List<Venta> ventasRestaurante = grupo.getVentas().stream()
-                            .filter(venta -> venta.getTipoVenta().equals(TipoVenta.RESTAURANTE))
+                            .filter(venta -> venta.getTipoVenta().equals(TipoVenta.WINE))
                             .collect(Collectors.toList());
 
                     double totalVentas = ventasRestaurante.stream()
@@ -81,33 +172,6 @@ public class GrupoServiceImpl extends BaseServiceImpl<Grupo, Long> implements Gr
                         }
                         grupo.setTotal(total);
                     }
-
-                    return grupo;
-                })
-                .collect(Collectors.toList());
-    }
-
-    public List<Grupo> listarGruposWine() {
-        List<Grupo> grupos = grupoRepository.findByTipoVentaWne();
-
-        return grupos.stream()
-                .map(grupo -> {
-                    List<Venta> ventasRestaurante = grupo.getVentas().stream()
-                            .filter(venta -> venta.getTipoVenta().equals(TipoVenta.WINE))
-                            .collect(Collectors.toList());
-
-                    double totalVentas = ventasRestaurante.stream()
-                            .mapToDouble(Venta::getMontoVenta)
-                            .sum();
-                    grupo.setMontoVentasGrupo(totalVentas);
-
-                    Double totalProvisional = totalVentas + grupo.getMontoMesa();
-                    double descuentoCuentaCorriente = calcularCuentaCorriente(totalProvisional, grupo.getEmpresa().getId());
-                    grupo.setDescuentoCtaCorriente(descuentoCuentaCorriente);
-                    double descuentoComsion = calcularComision(grupo.getEmpresa().getId(), totalProvisional);
-                    grupo.setDescuentoComision(descuentoComsion);
-                    Double total = totalProvisional - descuentoCuentaCorriente - descuentoComsion;
-                    grupo.setTotal(total);
 
                     return grupo;
                 })

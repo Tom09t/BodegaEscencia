@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/detallesRegalo")
@@ -29,6 +31,13 @@ public class DetalleRegaloController {
     ) throws Exception {
      DetalleRegalo detalleRegalo=detalleRegaloService.buscarDetalleRegalo(idRegalo,idDetalle);
      return new ResponseEntity<>(detalleRegalo, HttpStatus.OK);
+
+    }
+
+    @GetMapping("/d/{id}")
+    public ResponseEntity<List<DetalleRegalo>>obtenerDetalles(@PathVariable Long id){
+        List<DetalleRegalo>detalleRegalos=detalleRegaloService.listaDetalle(id);
+        return ResponseEntity.ok(detalleRegalos);
 
     }
 

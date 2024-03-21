@@ -2,10 +2,8 @@ package com.paquete.Bodega.services.serviceimpl;
 
 import com.paquete.Bodega.DTO.DetalleRegaloDto;
 import com.paquete.Bodega.DTO.RegaloDto;
-import com.paquete.Bodega.models.DetalleRegalo;
-import com.paquete.Bodega.models.Grupo;
-import com.paquete.Bodega.models.Producto;
-import com.paquete.Bodega.models.Regalo;
+import com.paquete.Bodega.Enum.TipoVenta;
+import com.paquete.Bodega.models.*;
 import com.paquete.Bodega.repository.*;
 import com.paquete.Bodega.services.service.RegaloService;
 import jakarta.transaction.Transactional;
@@ -13,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -55,6 +54,7 @@ try{
 
         Regalo nuevoRegalo = new Regalo();
         nuevoRegalo.setFecha(regalo.getFecha());
+        nuevoRegalo.setGrupo(grupoExistente);
 
         Regalo regaloGuardado=regaloRepository.save(nuevoRegalo);
         List<DetalleRegalo>detalles= new ArrayList<>();
@@ -111,4 +111,21 @@ try{
     }
 
 
+    public List<Regalo> listarRegalo(Long id) {
+
+        Grupo grupo = grupoRepository.findById(id).orElse(null);
+if(grupo!=null){
+    List<Regalo>regalos=regaloRepository.findByGrupoId(id);
+    return regalos;
+        }else {
+    System.out.println("Grupo no encontrado");
+    return Collections.emptyList();
+}
+
+
+
+
+
+
+    }
 }

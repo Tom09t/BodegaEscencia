@@ -3,6 +3,7 @@ package com.paquete.Bodega.controller;
 import com.paquete.Bodega.DTO.RegaloDto;
 import com.paquete.Bodega.models.FormaDePago;
 import com.paquete.Bodega.models.Regalo;
+import com.paquete.Bodega.models.Venta;
 import com.paquete.Bodega.services.serviceimpl.FormaDePagoServiceImpl;
 import com.paquete.Bodega.services.serviceimpl.RegaloServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -39,6 +41,13 @@ try{
         String mensaje ="Regalo eliminado con id " + id;
         return ResponseEntity.ok((mensaje));
     }
+
+    @GetMapping("/grupo/{id}")
+    public ResponseEntity<List<Regalo>> obtenerVentasDeGrupoRestaurante(@PathVariable Long id) {
+        List<Regalo> regalos = regaloService.listarRegalo(id);
+        return ResponseEntity.ok(regalos);
+    }
+
 
 
 }
