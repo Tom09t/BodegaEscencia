@@ -7,6 +7,7 @@ import com.paquete.Bodega.models.Producto;
 import com.paquete.Bodega.models.Venta;
 import com.paquete.Bodega.repository.EmpresaRepository;
 import com.paquete.Bodega.services.serviceimpl.GrupoServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,7 +70,20 @@ private GrupoServiceImpl grupoService;
             return new ResponseEntity<>("No se encontró el grupo con ID: " + id, HttpStatus.NOT_FOUND);
         }
     }
+    @GetMapping("/pdf")
+    public void generarPdfCierreDeGrupos(HttpServletResponse response) {
+        try {
+            // Configurar la respuesta HTTP para que devuelva un archivo PDF
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=cierre-de-grupos.pdf");
 
+
+           grupoService.generarPdf(response.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+    }
 
 
 

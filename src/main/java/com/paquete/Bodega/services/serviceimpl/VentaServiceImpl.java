@@ -2,6 +2,8 @@ package com.paquete.Bodega.services.serviceimpl;
 
 import com.paquete.Bodega.DTO.DetalleVentaDto;
 import com.paquete.Bodega.DTO.VentaDto;
+import com.paquete.Bodega.Enum.EstadoGrupo;
+import com.paquete.Bodega.Enum.EstadoGrupoWine;
 import com.paquete.Bodega.Enum.TipoGrupo;
 import com.paquete.Bodega.Enum.TipoVenta;
 import com.paquete.Bodega.models.*;
@@ -64,7 +66,9 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
             Grupo grupoExistente = grupoRepository.findById(grupoId)
                     .orElseThrow(() -> new Exception("No se encontró el grupo con ID: " + grupoId));
 
-
+            if(grupoExistente.getEstadoGrupoWine().equals(EstadoGrupoWine.CERRADOWINE) || grupoExistente.getEstadoGrupoWine().equals(EstadoGrupoWine.SUSPENDIDOWINE)){
+                throw new Exception("No se puede agregar una venta en el estado actual de este grupo");
+            }
 
             Venta nuevaVenta = new Venta();
             nuevaVenta.setTipoVenta(TipoVenta.WINE);
@@ -158,7 +162,10 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                     .orElseThrow(() -> new Exception("No se encontró el grupo con ID: " + grupoId));
 
 
-    System.out.println("grupo " + grupoExistente.getTipoGrupo());
+            if(grupoExistente.getEstadoGrupo().equals(EstadoGrupo.CERRADO) || grupoExistente.getEstadoGrupo().equals(EstadoGrupo.SUSPENDIDO)){
+                throw new Exception("No se puede agregar una venta en el estado actual de este grupo");
+            }
+
             Venta nuevaVenta = new Venta();
             nuevaVenta.setTipoVenta(TipoVenta.RESTAURANTE);
             nuevaVenta.setFormaPago(ventaDTO.getFormaPago());

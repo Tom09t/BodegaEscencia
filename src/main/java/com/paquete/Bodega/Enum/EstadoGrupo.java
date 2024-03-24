@@ -4,7 +4,9 @@ public enum EstadoGrupo {
 
     ABIERTO,
     CERRADO,
-    SUSPENDIDO
+    SUSPENDIDO,
+
+
 
 
 }

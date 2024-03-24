@@ -2,6 +2,7 @@ package com.paquete.Bodega.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.paquete.Bodega.Enum.EstadoGrupo;
+import com.paquete.Bodega.Enum.EstadoGrupoWine;
 import com.paquete.Bodega.Enum.TipoGrupo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,13 +31,16 @@ public class Grupo extends BaseEntidad{
    // @NotNull
     private EstadoGrupo estadoGrupo;
 
+    private EstadoGrupoWine estadoGrupoWine;
+
     private Double descuentoCtaCorriente;
 
     private Double descuentoComision;
     private Double total;
 
+private LocalDateTime fechaCreacion;
 
-    private TipoGrupo tipoGrupo;
+
 
    // @NotNull
     private Double montoMesa;
